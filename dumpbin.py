@@ -72,11 +72,11 @@ print("bits 32")
 
 while cur < FileSize:
     if cur in solved:
-        print()
+        print("")
         print("loc_{:08x}:".format(cur))
         eob = False
     elif cur in endaddrs:
-        print()
+        print("")
         print("loc_{:08x}:".format(cur))
 
     if eob:
