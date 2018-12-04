@@ -104,6 +104,10 @@ while cur < FileSize:
         elif orig_insn[0:4] == "rep ":
             # need a work around
             print(orig_insn[0:9] + "  ; " + orig_insn)
+        elif insn["type"] == "lea":
+            print(orig_insn.replace("dword ", "")) # nasm doesn't like "lea r32, dword ..."
+        elif insn["type"] in ["ujmp", "ucall"]:
+            print(orig_insn + "  ; " + insn["type"])
         else:
             print(orig_insn)
 
