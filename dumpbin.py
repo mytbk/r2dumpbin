@@ -156,6 +156,10 @@ while cur < EndAddr:
             print(orig_insn.replace("dword ", "")) # nasm doesn't like "lea r32, dword ..."
         elif insn["type"] in ["ujmp", "ucall"]:
             print(orig_insn + "  ; " + insn["type"])
+        elif insn["type"] == "mov" and insn.get("val", -1) in solved:
+            # mov ..., loc_...
+            lb_insn = re.sub(", 0x.*$", ", loc_{:08x}".format(insn["val"]), orig_insn)
+            print(lb_insn + "  ; " + orig_insn)
         else:
             print(orig_insn)
 
