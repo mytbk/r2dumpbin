@@ -16,7 +16,7 @@ import logging
 
 logging.basicConfig(level=logging.INFO)
 
-Aggresive = 1
+Aggresive = 2
 
 
 def hasSubList(heystack, needle):
@@ -112,15 +112,19 @@ while len(unsolved) > 0 or len(speculate) > 0:
     # try to continue disassembling a possible function
     # search to a 4-byte boundary
     while True:
-        Bytes = r2.cmdj("xj 10 @ {}".format(cur))
+        Bytes = r2.cmdj("xj 256 @ {}".format(cur))
         if Bytes[0:3] == [0x55, 0x89, 0xe5]: # push ebp; mov ebp, esp
             speculate.add(cur)
             break
-        elif Aggresive >= 1 and Bytes[0] == 0x55 and hasSubList(Bytes, [0x89, 0xe5]):
+        elif Aggresive >= 1 and Bytes[0] == 0x55 and hasSubList(Bytes[1:10], [0x89, 0xe5]):
             # push ebp; ... ; mov ebp, esp
             speculate.add(cur)
             break
-        elif Aggresive >= 2 and Bytes[0] == 0x55: # just a push ebp
+        elif Aggresive >= 2 and Bytes[0] == 0x55 and hasSubList(Bytes[1:20], [0x89, 0xe5]):
+            # push ebp; ... ; mov ebp, esp
+            speculate.add(cur)
+            break
+        elif Aggresive >= 9 and Bytes[0] == 0x55: # just a push ebp
             speculate.add(cur)
             break
 
@@ -132,8 +136,12 @@ while len(unsolved) > 0 or len(speculate) > 0:
     solved.add(unsolved[0])
     del(unsolved[0])
 
+logging.info("Analyze complete, going to output ASM.")
+logging.info("{} locations to be printed.".format(len(solved)))
+
 cur = BaseAddr
 eob = True
+nsolved = 0
 
 print("bits 32")
 print("org 0x{:08x}".format(BaseAddr))
@@ -147,6 +155,7 @@ while cur < EndAddr:
 
         print("")
         print("loc_{:08x}:".format(cur) + StrSpec)
+        nsolved = nsolved + 1
         eob = False
     elif cur in endaddrs:
         print("")
@@ -195,3 +204,8 @@ while cur < EndAddr:
         if cur in solved or cur in endaddrs:
             eob = True
             break
+
+logging.info("Printed {} locations.".format(nsolved))
+
+if len(solved) != nsolved:
+    logging.info("solved {} functions, but there are {} functions to be solved!".format(nsolved, len(solved)))
