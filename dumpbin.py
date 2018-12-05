@@ -16,7 +16,19 @@ import logging
 
 logging.basicConfig(level=logging.INFO)
 
-More_Aggresive = True
+Aggresive = 1
+
+
+def hasSubList(heystack, needle):
+    L = len(needle)
+    idx = 0
+    while idx + L <= len(heystack):
+        if heystack[idx:idx+L] == needle:
+            return True
+        idx = idx + 1
+
+    return False
+
 
 r2 = r2pipe.open()
 
@@ -61,6 +73,8 @@ while len(unsolved) > 0 or len(speculate) > 0:
     if SpecMode:
         speculate_set.add(cur)
 
+    logging.debug("Analyzing {:08x}".format(cur))
+
     while not eob:
         insns = r2.cmdj("pij @ {}".format(cur))
 
@@ -93,14 +107,27 @@ while len(unsolved) > 0 or len(speculate) > 0:
             if insn["type"] == "call":
                 unsolved.append(insn["jump"])
     
+    endaddrs.add(cur)
+
     # try to continue disassembling a possible function
-    Bytes = r2.cmdj("xj 3 @ {}".format(cur))
-    if Bytes == [0x55, 0x89, 0xe5]: # push ebp; mov ebp, esp
-        speculate.add(cur)
-    elif More_Aggresive and Bytes[0] == 0x55: # just a push ebp
-        speculate.add(cur)
-    else:
-        endaddrs.add(cur)
+    # search to a 4-byte boundary
+    while True:
+        Bytes = r2.cmdj("xj 10 @ {}".format(cur))
+        if Bytes[0:3] == [0x55, 0x89, 0xe5]: # push ebp; mov ebp, esp
+            speculate.add(cur)
+            break
+        elif Aggresive >= 1 and Bytes[0] == 0x55 and hasSubList(Bytes, [0x89, 0xe5]):
+            # push ebp; ... ; mov ebp, esp
+            speculate.add(cur)
+            break
+        elif Aggresive >= 2 and Bytes[0] == 0x55: # just a push ebp
+            speculate.add(cur)
+            break
+
+        if cur % 4 == 0:
+            break
+        else:
+            cur += 1
 
     solved.add(unsolved[0])
     del(unsolved[0])
