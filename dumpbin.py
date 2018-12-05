@@ -73,7 +73,13 @@ while len(unsolved) > 0:
             if insn["type"] == "call":
                 unsolved.append(insn["jump"])
     
-    endaddrs.add(cur)
+    # try to continue disassembling a possible function
+    Bytes = r2.cmdj("xj 3 @ {}".format(cur))
+    if Bytes == [0x55, 0x89, 0xe5]: # push ebp; mov ebp, esp
+        unsolved.append(cur)
+    else:
+        endaddrs.add(cur)
+
     solved.add(unsolved[0])
     del(unsolved[0])
 
