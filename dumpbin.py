@@ -113,10 +113,12 @@ while cur < EndAddr:
 
         orig_insn = insn["opcode"]
         if insn["type"] in ["jmp", "cjmp", "call"]:
-            if insn["type"] != "call" and insn["size"] == 2:
-                prefix = "short "
-            else:
-                prefix = ""
+            prefix = ""
+            if insn["type"] != "call":
+                if insn["size"] == 2:
+                    prefix = "short "
+                elif insn["size"] == 5:
+                    prefix = "near "
 
             lb_insn = re.sub("0x.*", prefix + "loc_{:08x}".format(insn["jump"]), orig_insn)
             print(lb_insn + "  ; " + orig_insn)
