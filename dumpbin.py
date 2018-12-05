@@ -7,6 +7,7 @@
 #
 # usage:
 # $ r2 mrc.bin 
+# [0x00000000]> f va @ 0xfffa0000
 # [0x00000000]> . dumpbin.py > mrc.asm
 
 import r2pipe
@@ -14,12 +15,23 @@ import re
 
 r2 = r2pipe.open()
 
-unsolved = [0]
+unsolved = []
 solved = set()
 endaddrs = set()
 
 FileSize = r2.cmdj("ij")["core"]["size"]
 r2.cmd("e asm.bits = 32")
+
+Flags = r2.cmdj("fj")
+BaseAddr = 0
+for f in Flags:
+    if f["name"] == "va":
+        BaseAddr = f["offset"]
+        r2.cmd("omb. {}".format(BaseAddr))
+
+EndAddr = BaseAddr + FileSize
+
+unsolved.append(BaseAddr)
 
 while len(unsolved) > 0:
     cur = unsolved[0]
@@ -33,7 +45,7 @@ while len(unsolved) > 0:
         insns = r2.cmdj("pij @ {}".format(cur))
 
         for insn in insns:
-            if cur >= FileSize:
+            if cur >= EndAddr:
                 eob = True
                 break
 
@@ -65,12 +77,13 @@ while len(unsolved) > 0:
     solved.add(unsolved[0])
     del(unsolved[0])
 
-cur = 0
+cur = BaseAddr
 eob = True
 
 print("bits 32")
+print("org 0x{:08x}".format(BaseAddr))
 
-while cur < FileSize:
+while cur < EndAddr:
     if cur in solved:
         print("")
         print("loc_{:08x}:".format(cur))
