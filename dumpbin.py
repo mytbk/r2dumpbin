@@ -12,10 +12,17 @@
 
 import r2pipe
 import re
+import logging
+
+logging.basicConfig(level=logging.INFO)
+
+More_Aggresive = True
 
 r2 = r2pipe.open()
 
 unsolved = []
+speculate = set()
+speculate_set = set()
 solved = set()
 endaddrs = set()
 
@@ -33,13 +40,26 @@ EndAddr = BaseAddr + FileSize
 
 unsolved.append(BaseAddr)
 
-while len(unsolved) > 0:
+SpecMode = False
+
+while len(unsolved) > 0 or len(speculate) > 0:
+    if len(unsolved) == 0:
+        unsolved = list(speculate.difference(solved))
+        speculate.clear()
+        SpecMode = True
+        if len(unsolved) == 0:
+            break
+        logging.debug("Analyze undirect functions.")
+
     cur = unsolved[0]
     eob = False
 
     if cur in solved:
         del(unsolved[0])
         continue
+
+    if SpecMode:
+        speculate_set.add(cur)
 
     while not eob:
         insns = r2.cmdj("pij @ {}".format(cur))
@@ -76,7 +96,9 @@ while len(unsolved) > 0:
     # try to continue disassembling a possible function
     Bytes = r2.cmdj("xj 3 @ {}".format(cur))
     if Bytes == [0x55, 0x89, 0xe5]: # push ebp; mov ebp, esp
-        unsolved.append(cur)
+        speculate.add(cur)
+    elif More_Aggresive and Bytes[0] == 0x55: # just a push ebp
+        speculate.add(cur)
     else:
         endaddrs.add(cur)
 
@@ -91,8 +113,13 @@ print("org 0x{:08x}".format(BaseAddr))
 
 while cur < EndAddr:
     if cur in solved:
+        if cur in speculate_set:
+            StrSpec = "  ; not directly referenced"
+        else:
+            StrSpec = ""
+
         print("")
-        print("loc_{:08x}:".format(cur))
+        print("loc_{:08x}:".format(cur) + StrSpec)
         eob = False
     elif cur in endaddrs:
         print("")
