@@ -189,6 +189,24 @@ while cur < EndAddr:
         print("loc_{:08x}:".format(cur))
 
     if eob:
+        if cur % 4 == 0 and cur + 4 <= EndAddr:
+            usedd = True
+            for addr in [cur + 1, cur + 2, cur + 3]:
+                if addr in solved or addr in non_function_immref or addr in endaddrs:
+                    usedd = False
+                    break
+            if usedd:
+                Bytes = r2.cmdj("xj 4 @ {}".format(cur))
+                val = (Bytes[3] << 24) | (Bytes[2] << 16) | (Bytes[1] << 8) | Bytes[0]
+                if val in functions:
+                    print("dd fcn_{:08x}".format(val))
+                elif val in non_function_immref:
+                    print("dd ref_{:08x}".format(val))
+                else:
+                    print("dd 0x{:08x}".format(val))
+                cur = cur + 4
+                continue
+
         Byte = r2.cmdj("xj 1 @ {}".format(cur))[0]
         print("db 0x{:02x}".format(Byte))
         cur = cur + 1
