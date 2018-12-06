@@ -37,6 +37,7 @@ speculate = set()
 speculate_set = set()
 solved = set()
 endaddrs = set()
+immref = set()
 
 FileSize = r2.cmdj("ij")["core"]["size"]
 r2.cmd("e asm.bits = 32")
@@ -91,7 +92,10 @@ while len(unsolved) > 0 or len(speculate) > 0:
                 break
 
             cur += insn["size"]
-    
+
+            if insn.get("val") is not None and insn["val"] >= BaseAddr and insn["val"] < EndAddr:
+                immref.add(insn["val"])
+
             if insn["type"] == "ret":
                 eob = True
                 break
@@ -139,6 +143,9 @@ while len(unsolved) > 0 or len(speculate) > 0:
 logging.info("Analyze complete, going to output ASM.")
 logging.info("{} locations to be printed.".format(len(solved)))
 
+non_function_immref = immref.difference(solved)
+logging.info("{} non function immediate references.".format(len(non_function_immref)))
+
 cur = BaseAddr
 eob = True
 nsolved = 0
@@ -157,6 +164,9 @@ while cur < EndAddr:
         print("loc_{:08x}:".format(cur) + StrSpec)
         nsolved = nsolved + 1
         eob = False
+    elif cur in non_function_immref:
+        print("")
+        print("ref_{:08x}:".format(cur))
     elif cur in endaddrs:
         print("")
         print("loc_{:08x}:".format(cur))
@@ -192,14 +202,16 @@ while cur < EndAddr:
             print(orig_insn.replace("dword ", "")) # nasm doesn't like "lea r32, dword ..."
         elif insn["type"] in ["ujmp", "ucall"]:
             print(orig_insn + "  ; " + insn["type"])
-        elif insn["type"] == "mov" and insn.get("val", -1) in solved:
-            # mov ..., loc_...
-            lb_insn = re.sub(", 0x.*$", ", loc_{:08x}".format(insn["val"]), orig_insn)
-            print(lb_insn + "  ; " + orig_insn)
-        elif insn["type"] == "push" and insn.get("val", -1) in solved:
-            # push loc_...
-            lb_insn = re.sub("0x.*$", ", loc_{:08x}".format(insn["val"]), orig_insn)
-            print(lb_insn + "  ; " + orig_insn)
+        elif insn.get("val") is not None:
+            val = insn["val"]
+            if val in solved:
+                lb_insn = re.sub("0x[0-9a-fA-F]*$", "loc_{:08x}".format(val), orig_insn)
+                print(lb_insn + "  ; " + orig_insn)
+            elif val in non_function_immref:
+                lb_insn = re.sub("0x[0-9a-fA-F]*$", "ref_{:08x}".format(val), orig_insn)
+                print(lb_insn + "  ; " + orig_insn)
+            else:
+                print(orig_insn)
         else:
             print(orig_insn)
 
