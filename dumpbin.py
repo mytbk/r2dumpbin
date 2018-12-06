@@ -196,6 +196,10 @@ while cur < EndAddr:
             # mov ..., loc_...
             lb_insn = re.sub(", 0x.*$", ", loc_{:08x}".format(insn["val"]), orig_insn)
             print(lb_insn + "  ; " + orig_insn)
+        elif insn["type"] == "push" and insn.get("val", -1) in solved:
+            # push loc_...
+            lb_insn = re.sub("0x.*$", ", loc_{:08x}".format(insn["val"]), orig_insn)
+            print(lb_insn + "  ; " + orig_insn)
         else:
             print(orig_insn)
 
