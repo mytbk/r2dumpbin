@@ -128,6 +128,7 @@ while len(unsolved) > 0 or len(speculate) > 0:
         Bytes = r2.cmdj("xj 256 @ {}".format(cur))
         if Bytes[0:3] == [0x55, 0x89, 0xe5]: # push ebp; mov ebp, esp
             speculate.add(cur)
+            functions.add(cur)
             break
         elif Aggresive >= 1 and Bytes[0] == 0x55 and hasSubList(Bytes[1:10], [0x89, 0xe5]):
             # push ebp; ... ; mov ebp, esp
