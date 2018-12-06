@@ -97,6 +97,13 @@ while len(unsolved) > 0 or len(speculate) > 0:
             if insn.get("val") is not None and insn["val"] >= BaseAddr and insn["val"] < EndAddr:
                 immref.add(insn["val"])
 
+            if insn.get("ptr") is not None:
+                ptr = insn["ptr"]
+                if ptr < 0:
+                    ptr += (1 << 32)
+                if ptr >= BaseAddr and ptr < EndAddr:
+                    immref.add(ptr)
+
             if insn["type"] == "ret":
                 eob = True
                 break
@@ -227,6 +234,17 @@ while cur < EndAddr:
                 print(lb_insn + "  ; " + orig_insn)
             elif val in non_function_immref:
                 lb_insn = re.sub("0x[0-9a-fA-F]*$", "ref_{:08x}".format(val), orig_insn)
+                print(lb_insn + "  ; " + orig_insn)
+            else:
+                print(orig_insn)
+        elif insn.get("ptr") is not None:
+            ptr = insn["ptr"]
+            if ptr < 0:
+                ptr += (1 << 32)
+            if ptr in non_function_immref:
+                lb_insn = re.sub("- 0x[0-9a-fA-F]*", "+ ref_{:08x}".format(ptr), orig_insn)
+                lb_insn = re.sub("\\+ 0x[0-9a-fA-F]*", "+ ref_{:08x}".format(ptr), lb_insn)
+                lb_insn = re.sub("0x[0-9a-fA-F]*", "ref_{:08x}".format(ptr), lb_insn)
                 print(lb_insn + "  ; " + orig_insn)
             else:
                 print(orig_insn)
