@@ -38,6 +38,7 @@ speculate_set = set()
 solved = set()
 endaddrs = set()
 immref = set()
+functions = set()
 
 FileSize = r2.cmdj("ij")["core"]["size"]
 r2.cmd("e asm.bits = 32")
@@ -110,6 +111,7 @@ while len(unsolved) > 0 or len(speculate) > 0:
     
             if insn["type"] == "call":
                 unsolved.append(insn["jump"])
+                functions.add(insn["jump"])
     
     endaddrs.add(cur)
 
@@ -123,13 +125,16 @@ while len(unsolved) > 0 or len(speculate) > 0:
         elif Aggresive >= 1 and Bytes[0] == 0x55 and hasSubList(Bytes[1:10], [0x89, 0xe5]):
             # push ebp; ... ; mov ebp, esp
             speculate.add(cur)
+            functions.add(cur)
             break
         elif Aggresive >= 2 and Bytes[0] == 0x55 and hasSubList(Bytes[1:20], [0x89, 0xe5]):
             # push ebp; ... ; mov ebp, esp
             speculate.add(cur)
+            functions.add(cur)
             break
         elif Aggresive >= 9 and Bytes[0] == 0x55: # just a push ebp
             speculate.add(cur)
+            functions.add(cur)
             break
 
         if cur % 4 == 0:
@@ -160,8 +165,12 @@ while cur < EndAddr:
         else:
             StrSpec = ""
 
+        if cur in functions:
+            prefix = "fcn_"
+        else:
+            prefix = "loc_"
         print("")
-        print("loc_{:08x}:".format(cur) + StrSpec)
+        print(prefix + "{:08x}:".format(cur) + StrSpec)
         nsolved = nsolved + 1
         eob = False
     elif cur in non_function_immref:
@@ -193,7 +202,12 @@ while cur < EndAddr:
                 elif insn["size"] == 5:
                     prefix = "near "
 
-            lb_insn = re.sub("0x.*", prefix + "loc_{:08x}".format(insn["jump"]), orig_insn)
+            tgt = insn["jump"]
+            if tgt in functions:
+                prefix += "fcn_"
+            else:
+                prefix += "loc_"
+            lb_insn = re.sub("0x.*", prefix + "{:08x}".format(tgt), orig_insn)
             print(lb_insn + "  ; " + orig_insn)
         elif orig_insn[0:4] == "rep ":
             # need a work around
@@ -205,7 +219,11 @@ while cur < EndAddr:
         elif insn.get("val") is not None:
             val = insn["val"]
             if val in solved:
-                lb_insn = re.sub("0x[0-9a-fA-F]*$", "loc_{:08x}".format(val), orig_insn)
+                if val in functions:
+                    prefix = "fcn_"
+                else:
+                    prefix = "loc_"
+                lb_insn = re.sub("0x[0-9a-fA-F]*$", prefix + "{:08x}".format(val), orig_insn)
                 print(lb_insn + "  ; " + orig_insn)
             elif val in non_function_immref:
                 lb_insn = re.sub("0x[0-9a-fA-F]*$", "ref_{:08x}".format(val), orig_insn)
