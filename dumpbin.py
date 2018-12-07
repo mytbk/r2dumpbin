@@ -177,6 +177,7 @@ cur = BaseAddr
 eob = True
 nsolved = 0
 
+print(";; Generated with dumpbin (https://github.com/mytbk/dumpbin)\n")
 print("bits 32")
 print("org 0x{:08x}".format(BaseAddr))
 
