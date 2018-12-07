@@ -285,6 +285,11 @@ while cur < EndAddr:
         if insn["type"] in ["ujmp", "ucall"]:
             comment = insn["type"]
 
+        # First, correct the r2 assembly to the NASM one
+        if insn["type"] == "lea":
+            # nasm doesn't like "lea r32, dword ..."
+            orig_insn = orig_insn.replace("dword ", "")
+
         if insn["type"] in ["jmp", "cjmp", "call"]:
             prefix = ""
             if insn["type"] != "call":
@@ -303,8 +308,6 @@ while cur < EndAddr:
         elif orig_insn[0:4] == "rep ":
             # need a work around
             print(orig_insn[0:9] + "  ; " + orig_insn)
-        elif insn["type"] == "lea":
-            print(orig_insn.replace("dword ", "")) # nasm doesn't like "lea r32, dword ..."
         elif insn.get("val") is not None:
             val = insn["val"]
             if val in solved:
