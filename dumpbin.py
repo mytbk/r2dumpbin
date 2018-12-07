@@ -280,17 +280,17 @@ while cur < EndAddr:
         cur += insn["size"]
 
         orig_insn = insn["opcode"]
+        final_insn = orig_insn
         comment = ""
-
-        if insn["type"] in ["ujmp", "ucall"]:
-            comment = insn["type"]
 
         # First, correct the r2 assembly to the NASM one
         if insn["type"] == "lea":
             # nasm doesn't like "lea r32, dword ..."
-            orig_insn = orig_insn.replace("dword ", "")
-
-        if insn["type"] in ["jmp", "cjmp", "call"]:
+            final_insn = orig_insn.replace("dword ", "")
+        elif orig_insn[0:4] == "rep ":
+            comment = orig_insn
+            final_insn = orig_insn[0:9]
+        elif insn["type"] in ["jmp", "cjmp", "call"]:
             prefix = ""
             if insn["type"] != "call":
                 if insn["size"] == 2:
@@ -303,43 +303,47 @@ while cur < EndAddr:
                 prefix += "fcn_"
             else:
                 prefix += "loc_"
-            lb_insn = re.sub("0x.*", prefix + "{:08x}".format(tgt), orig_insn)
-            print(lb_insn + "  ; " + orig_insn)
-        elif orig_insn[0:4] == "rep ":
-            # need a work around
-            print(orig_insn[0:9] + "  ; " + orig_insn)
-        elif insn.get("val") is not None:
-            val = insn["val"]
-            if val in solved:
-                if val in functions:
-                    prefix = "fcn_"
-                else:
-                    prefix = "loc_"
-                lb_insn = re.sub("0x[0-9a-fA-F]*$", prefix + "{:08x}".format(val), orig_insn)
-                print(lb_insn + "  ; " + orig_insn)
+            final_insn = re.sub("0x.*", prefix + "{:08x}".format(tgt), orig_insn)
+            comment = orig_insn
+
+        # process val and ptr
+        val = insn.get("val")
+        if val is not None:
+            if val in functions:
+                prefix = "fcn_"
+            elif val in solved:
+                prefix = "loc_"
             elif val in non_function_immref:
-                lb_insn = re.sub("0x[0-9a-fA-F]*$", "ref_{:08x}".format(val), orig_insn)
-                print(lb_insn + "  ; " + orig_insn)
+                prefix = "ref_"
             else:
-                print(orig_insn)
-        elif insn.get("ptr") is not None:
-            ptr = insn["ptr"]
+                prefix = ""
+
+            if len(prefix) > 0:
+                comment = orig_insn
+                final_insn = re.sub("0x[0-9a-fA-F]*$", prefix + "{:08x}".format(val), final_insn)
+
+        ptr = insn.get("ptr")
+        # note that radare2 set ptr as val for mov instructions
+        # when memory displacement is small and immediate is big
+        if ptr is not None and ptr != val:
             if ptr < 0:
                 ptr += (1 << 32)
             if ptr in non_function_immref:
-                lb_insn = re.sub("- 0x[0-9a-fA-F]*\\]", "+ ref_{:08x}]".format(ptr), orig_insn)
-                lb_insn = re.sub("\\+ 0x[0-9a-fA-F]*\\]", "+ ref_{:08x}]".format(ptr), lb_insn)
-                lb_insn = re.sub("0x[0-9a-fA-F]*\\]", "ref_{:08x}]".format(ptr), lb_insn)
-                print(lb_insn + "  ; " + comment + "; " + orig_insn)
-            elif insn["type"] in ["ujmp", "ucall"]:
-                # TODO: clean up this duplicate code
-                print(orig_insn + "  ; " + comment)
+                final_insn = re.sub("- 0x[0-9a-fA-F]*\\]", "+ ref_{:08x}]".format(ptr), final_insn)
+                final_insn = re.sub("\\+ 0x[0-9a-fA-F]*\\]", "+ ref_{:08x}]".format(ptr), final_insn)
+                final_insn = re.sub("0x[0-9a-fA-F]*\\]", "ref_{:08x}]".format(ptr), final_insn)
+                comment = orig_insn
+
+        if insn["type"] in ["ujmp", "ucall"]:
+            if len(comment) > 0:
+                comment = insn["type"] + ": " + comment
             else:
-                print(orig_insn)
-        elif insn["type"] in ["ujmp", "ucall"]:
-            print(orig_insn + "  ; " + comment)
+                comment = insn["type"]
+
+        if len(comment) > 0:
+            print(final_insn + "  ; " + comment)
         else:
-            print(orig_insn)
+            print(final_insn)
 
         # do not check endaddrs before advancing cur, because
         # an end address can also be a start of a basic block
