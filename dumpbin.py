@@ -18,6 +18,9 @@ logging.basicConfig(level=logging.INFO)
 
 Aggresive = 2
 
+def get_insns(r2, addr):
+    return r2.cmdj("pij 10 @ {}".format(addr))
+
 
 def hasSubList(heystack, needle):
     L = len(needle)
@@ -78,7 +81,7 @@ while len(unsolved) > 0 or len(speculate) > 0:
     logging.debug("Analyzing {:08x}".format(cur))
 
     while not eob:
-        insns = r2.cmdj("pij @ {}".format(cur))
+        insns = get_insns(r2, cur)
 
         for insn in insns:
             if cur >= EndAddr:
@@ -200,7 +203,7 @@ while cur < EndAddr:
         continue
 
     else: # not eob
-        insns = r2.cmdj("pij @ {}".format(cur))
+        insns = get_insns(r2, cur)
         for insn in insns:
             if insn["type"] == "invalid":
                 break
@@ -269,7 +272,7 @@ while cur < EndAddr:
         cur = cur + 1
         continue
 
-    insns = r2.cmdj("pij @ {}".format(cur))
+    insns = get_insns(r2, cur)
     for insn in insns:
         if insn["type"] == "invalid":
             break
