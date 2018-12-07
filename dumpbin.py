@@ -324,9 +324,9 @@ while cur < EndAddr:
             if ptr < 0:
                 ptr += (1 << 32)
             if ptr in non_function_immref:
-                lb_insn = re.sub("- 0x[0-9a-fA-F]*", "+ ref_{:08x}".format(ptr), orig_insn)
-                lb_insn = re.sub("\\+ 0x[0-9a-fA-F]*", "+ ref_{:08x}".format(ptr), lb_insn)
-                lb_insn = re.sub("0x[0-9a-fA-F]*", "ref_{:08x}".format(ptr), lb_insn)
+                lb_insn = re.sub("- 0x[0-9a-fA-F]*\\]", "+ ref_{:08x}]".format(ptr), orig_insn)
+                lb_insn = re.sub("\\+ 0x[0-9a-fA-F]*\\]", "+ ref_{:08x}]".format(ptr), lb_insn)
+                lb_insn = re.sub("0x[0-9a-fA-F]*\\]", "ref_{:08x}]".format(ptr), lb_insn)
                 print(lb_insn + "  ; " + comment + "; " + orig_insn)
             elif insn["type"] in ["ujmp", "ucall"]:
                 # TODO: clean up this duplicate code
