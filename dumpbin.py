@@ -97,8 +97,8 @@ while len(unsolved) > 0 or len(speculate) > 0:
             if insn.get("val") is not None and insn["val"] >= BaseAddr and insn["val"] < EndAddr:
                 immref.add(insn["val"])
 
-            if insn.get("ptr") is not None:
-                ptr = insn["ptr"]
+            ptr = insn.get("ptr")
+            if ptr is not None:
                 if ptr < 0:
                     ptr += (1 << 32)
                 if ptr >= BaseAddr and ptr < EndAddr:
@@ -112,7 +112,21 @@ while len(unsolved) > 0 or len(speculate) > 0:
                 unsolved.append(insn["jump"])
                 eob = True
                 break
-    
+
+            if insn["type"] == "ujmp":
+                if ptr is not None and ptr in immref and ptr % 4 == 0:
+                    cur_ptr = ptr
+                    while True:
+                        Bytes = r2.cmdj("xj 4 @ {}".format(cur_ptr))
+                        loc = (Bytes[3] << 24) | (Bytes[2] << 16) | (Bytes[1] << 8) | Bytes[0]
+                        if loc >= BaseAddr and loc < EndAddr:
+                            unsolved.append(loc)
+                            cur_ptr += 4
+                        else:
+                            break
+                eob = True
+                break
+
             if insn["type"] == "cjmp":
                 unsolved.append(insn["jump"])
     
@@ -200,6 +214,8 @@ while cur < EndAddr:
                 val = (Bytes[3] << 24) | (Bytes[2] << 16) | (Bytes[1] << 8) | Bytes[0]
                 if val in functions:
                     print("dd fcn_{:08x}".format(val))
+                elif val in solved:
+                    print("dd loc_{:08x}".format(val))
                 elif val in non_function_immref:
                     print("dd ref_{:08x}".format(val))
                 else:
@@ -220,6 +236,11 @@ while cur < EndAddr:
         cur += insn["size"]
 
         orig_insn = insn["opcode"]
+        comment = ""
+
+        if insn["type"] in ["ujmp", "ucall"]:
+            comment = insn["type"]
+
         if insn["type"] in ["jmp", "cjmp", "call"]:
             prefix = ""
             if insn["type"] != "call":
@@ -240,8 +261,6 @@ while cur < EndAddr:
             print(orig_insn[0:9] + "  ; " + orig_insn)
         elif insn["type"] == "lea":
             print(orig_insn.replace("dword ", "")) # nasm doesn't like "lea r32, dword ..."
-        elif insn["type"] in ["ujmp", "ucall"]:
-            print(orig_insn + "  ; " + insn["type"])
         elif insn.get("val") is not None:
             val = insn["val"]
             if val in solved:
@@ -264,9 +283,14 @@ while cur < EndAddr:
                 lb_insn = re.sub("- 0x[0-9a-fA-F]*", "+ ref_{:08x}".format(ptr), orig_insn)
                 lb_insn = re.sub("\\+ 0x[0-9a-fA-F]*", "+ ref_{:08x}".format(ptr), lb_insn)
                 lb_insn = re.sub("0x[0-9a-fA-F]*", "ref_{:08x}".format(ptr), lb_insn)
-                print(lb_insn + "  ; " + orig_insn)
+                print(lb_insn + "  ; " + comment + "; " + orig_insn)
+            elif insn["type"] in ["ujmp", "ucall"]:
+                # TODO: clean up this duplicate code
+                print(orig_insn + "  ; " + comment)
             else:
                 print(orig_insn)
+        elif insn["type"] in ["ujmp", "ucall"]:
+            print(orig_insn + "  ; " + comment)
         else:
             print(orig_insn)
 
