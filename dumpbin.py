@@ -171,6 +171,46 @@ logging.info("Analyze complete, going to output ASM.")
 logging.info("{} locations to be printed.".format(len(solved)))
 
 non_function_immref = immref.difference(solved)
+
+logging.info("Analyze data references.")
+cur = BaseAddr
+eob = True
+while cur < EndAddr:
+    if cur in solved:
+        eob = False
+
+    if eob:
+        if cur % 4 == 0 and cur + 4 <= EndAddr:
+            usedd = True
+            for addr in [cur + 1, cur + 2, cur + 3]:
+                if addr in solved or addr in non_function_immref or addr in endaddrs:
+                    usedd = False
+                    break
+            if usedd:
+                Bytes = r2.cmdj("xj 4 @ {}".format(cur))
+                val = (Bytes[3] << 24) | (Bytes[2] << 16) | (Bytes[1] << 8) | Bytes[0]
+                if val >= BaseAddr and val < EndAddr and not val in solved:
+                    non_function_immref.add(val)
+
+                cur = cur + 4
+                continue
+
+        # cur is not 4B aligned or not usedd
+        cur = cur + 1
+        continue
+
+    else: # not eob
+        insns = r2.cmdj("pij @ {}".format(cur))
+        for insn in insns:
+            if insn["type"] == "invalid":
+                break
+
+            cur += insn["size"]
+            if cur in solved or cur in endaddrs:
+                eob = True
+                break
+
+
 logging.info("{} non function immediate references.".format(len(non_function_immref)))
 
 cur = BaseAddr
