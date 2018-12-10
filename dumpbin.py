@@ -36,6 +36,35 @@ def hasSubList(heystack, needle):
     return False
 
 
+def goodString(s):
+    end = len(s) - 1
+    if s[end] != 0:
+        return False
+    while s[end] == 0:
+        end = end - 1
+    for c in s[0:end]:
+        if c in [ord('\t'), ord('\n'), ord('\r')]:
+            continue
+        if c >= 0x20 and c < 0x7f:
+            continue
+        return False
+    return True
+
+
+def toString(s):
+    result = ""
+    started = False
+    for c in s:
+        if started:
+            result += ","
+        if c >= 0x20 and c < 0x7f and c != '\'':
+            result += "'" + chr(c) + "'"
+        else:
+            result += "0x{:02x}".format(c)
+        started = True
+    return result.replace("','", "")
+
+
 r2 = r2pipe.open()
 
 unsolved = []
@@ -219,6 +248,26 @@ while cur < EndAddr:
 
 logging.info("{} non function immediate references.".format(len(non_function_immref)))
 
+logging.info("Searching for ASCII strings.")
+
+ref_list = list(non_function_immref)
+ref_list.sort()
+ref_list.append(EndAddr)
+
+str_dict = dict()
+
+for idx in range(0, len(ref_list) - 1):
+    addr = ref_list[idx]
+    dist = ref_list[idx + 1] - addr
+    if dist < 4 or dist > 100:
+        continue
+
+    Bytes = r2.cmdj("xj {} @ {}".format(dist, addr))
+    if goodString(Bytes):
+        str_dict[addr] = (toString(Bytes), dist)
+
+logging.info("{} ASCII strings found.".format(len(str_dict)))
+
 cur = BaseAddr
 eob = True
 nsolved = 0
@@ -250,6 +299,12 @@ while cur < EndAddr:
         print("loc_{:08x}:".format(cur))
 
     if eob:
+        if str_dict.get(cur) is not None:
+            dbs, dist = str_dict[cur]
+            print("db {}".format(dbs))
+            cur += dist
+            continue
+
         if cur % 4 == 0 and cur + 4 <= EndAddr:
             usedd = True
             for addr in [cur + 1, cur + 2, cur + 3]:
