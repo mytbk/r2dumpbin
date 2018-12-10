@@ -9,6 +9,9 @@
 # $ r2 mrc.bin 
 # [0x00000000]> f va @ 0xfffa0000
 # [0x00000000]> . dumpbin.py > mrc.asm
+#
+# Then you can run `nasm mrc.asm` to generate a binary
+# called mrc which is identical to mrc.bin
 
 import r2pipe
 import re
@@ -220,7 +223,7 @@ cur = BaseAddr
 eob = True
 nsolved = 0
 
-print(";; Generated with dumpbin (https://github.com/mytbk/dumpbin)\n")
+print(";; Generated with r2dumpbin (https://github.com/mytbk/r2dumpbin)\n")
 print("bits 32")
 print("org 0x{:08x}".format(BaseAddr))
 
