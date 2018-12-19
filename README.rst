@@ -64,6 +64,12 @@ Some array data reference is not analyzed correctly, for example, the C code `ar
   db 0xff
   db 0x0e
   
-Actually, the last element of ref_fffcc218 is fcn_fffc63a7, but because of there's `(ref_fffcc240 - 1)[idx]` in the code, ref_fffcc23f breaks the last function pointer apart.
+Actually, the last element of ref_fffcc218 is loc_fffc63a7, but because of there's `(ref_fffcc240 - 1)[idx]` in the code, ref_fffcc23f breaks the last pointer apart.
 
 Fortunately, I only found this error in the dumped out code, and no error was observed before I found this incorrect data reference because the running code didn't use fcn_fffc63a7.
+
+
+Link the assembly with romstage
+---------------------------------
+
+I'm currently using this assembly code on Haswell platform. You can check out my code at https://github.com/mytbk/coreboot/tree/haswell-dumpbin.
