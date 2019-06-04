@@ -351,9 +351,15 @@ while cur < EndAddr:
         elif orig_insn[0:4] == "rep ":
             comment = orig_insn
             final_insn = orig_insn[0:9]
+        elif orig_insn[0:6] == "pushal":
+            final_insn = "pushad"
+        elif orig_insn[0:5] == "popal":
+            final_insn = "popad"
         elif insn["type"] in ["jmp", "cjmp", "call"]:
             prefix = ""
-            if insn["type"] != "call":
+            if "jecxz" in orig_insn:
+                pass
+            elif insn["type"] != "call":
                 if insn["size"] == 2:
                     prefix = "short "
                 elif insn["size"] == 5:
