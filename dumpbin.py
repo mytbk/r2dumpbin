@@ -136,6 +136,9 @@ while len(unsolved) > 0 or len(speculate) > 0:
             if ptr is not None:
                 if ptr < 0:
                     ptr += (1 << 32)
+                elif ptr >= (1 << 32): # new radare2 seems to be using ut64
+                    ptr &= 0xffffffff
+
                 if ptr >= BaseAddr and ptr < EndAddr:
                     immref.add(ptr)
 
@@ -386,6 +389,9 @@ while cur < EndAddr:
         if ptr is not None and ptr != val:
             if ptr < 0:
                 ptr += (1 << 32)
+            elif ptr >= (1 << 32):
+                ptr &= 0xffffffff
+
             if ptr in non_function_immref:
                 final_insn = re.sub("- 0x[0-9a-fA-F]*\\]", "+ ref_{:08x}]".format(ptr), final_insn)
                 final_insn = re.sub("\\+ 0x[0-9a-fA-F]*\\]", "+ ref_{:08x}]".format(ptr), final_insn)
