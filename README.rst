@@ -5,6 +5,8 @@ r2dumpbin is a `radare2 <https://radare.org>`__ script to dump a binary to assem
 
 I wrote this script for working with the `coreboot <https://www.coreboot.org>`__ project to convert mrc.bin to assembly, so that I can link it with coreboot romstage, and convert some assembly code in it to C code, and at last, fully reverse all the code to readable C code.
 
+The script is tested in radare2 4.2.1 and r2pipe 1.4.2. Other version of r2 may break some things.
+
 
 What does this script do?
 ---------------------------
@@ -40,6 +42,19 @@ After you get mrc.asm, you can assemble it with nasm, and find the resulting bin
   sha1sum mrc mrc.bin
 
 If you want to link it with other code, you need to remove the `org 0xfffa0000` line, rename the entry point label, and make it global. And use `-f elf` to generate an ELF object when assemble the code.
+
+
+Debug
+------
+
+To debug this script, you can modify the following line in dumpbin.py to change the debug level::
+
+  logging.basicConfig(level=logging.INFO)
+
+Then run r2 like::
+
+  r2 -qc 'f va @ 0xfffa0000; . dumpbin.py > haswell-mrc.asm' haswell-mrc.bin 2>debug.log
+
 
 Bug
 ---

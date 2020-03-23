@@ -129,18 +129,40 @@ while len(unsolved) > 0 or len(speculate) > 0:
 
             cur += insn["size"]
 
-            if insn.get("val") is not None and insn["val"] >= BaseAddr and insn["val"] < EndAddr:
-                immref.add(insn["val"])
+            if insn["type"] in ["and", "or", "xor"] and not insn["refptr"]:
+                # it's very rare to do bitwise operation on a reference
+                pass
+            else:
+                if insn.get("val") is not None and insn["val"] >= BaseAddr and insn["val"] < EndAddr:
+                    immref.add(insn["val"])
 
-            ptr = insn.get("ptr")
-            if ptr is not None:
-                if ptr < 0:
-                    ptr += (1 << 32)
-                elif ptr >= (1 << 32): # new radare2 seems to be using ut64
-                    ptr &= 0xffffffff
+                # since now many instructions don't have "ptr" attribute
+                # we need to match the disasm
+                disasm = insn["disasm"]
+                # [... + 0x...]
+                m = re.search("\\+ 0x[0-9a-fA-F]+\\]", disasm)
+                if m is not None:
+                    logging.debug(disasm)
+                    ptr = int(disasm[m.start() + 4:m.end() - 1], 16)
+                else:
+                    # [... - 0x...]
+                    m = re.search("- 0x[0-9a-fA-F]+\\]", disasm)
+                    if m is not None:
+                        logging.debug(disasm)
+                        ptr = int(disasm[m.start() + 4:m.end() - 1], 16)
+                        ptr = (1 << 32) - ptr
+                    else:
+                        # [0x...]
+                        m = re.search("\\[0x[0-9a-fA-F]+\\]", disasm)
+                        if m is not None:
+                            logging.debug(disasm)
+                            ptr = int(disasm[m.start() + 3:m.end() - 1], 16)
+                        else:
+                            ptr = None
 
-                if ptr >= BaseAddr and ptr < EndAddr:
+                if ptr is not None and ptr >= BaseAddr and ptr < EndAddr:
                     immref.add(ptr)
+
 
             if insn["type"] == "ret":
                 eob = True
@@ -167,11 +189,11 @@ while len(unsolved) > 0 or len(speculate) > 0:
 
             if insn["type"] == "cjmp":
                 unsolved.append(insn["jump"])
-    
+
             if insn["type"] == "call":
                 unsolved.append(insn["jump"])
                 functions.add(insn["jump"])
-    
+
     endaddrs.add(cur)
 
     # try to continue disassembling a possible function
@@ -266,6 +288,7 @@ for idx in range(0, len(ref_list) - 1):
         continue
 
     Bytes = r2.cmdj("xj {} @ {}".format(dist, addr))
+    logging.debug("dist = {}, addr = {}, Bytes = {}".format(dist, addr, Bytes))
     if goodString(Bytes):
         str_dict[addr] = (toString(Bytes), dist)
 
@@ -373,36 +396,50 @@ while cur < EndAddr:
             final_insn = re.sub("0x.*", prefix + "{:08x}".format(tgt), orig_insn)
             comment = orig_insn
 
-        # process val and ptr
-        val = insn.get("val")
-        if val is not None:
-            if val in functions:
-                prefix = "fcn_"
-            elif val in solved:
-                prefix = "loc_"
-            elif val in non_function_immref:
-                prefix = "ref_"
+        if insn["type"] not in ["and", "or", "xor"] or insn["refptr"]:
+            # process val and ptr
+            val = insn.get("val")
+            if val is not None:
+                if val in functions:
+                    prefix = "fcn_"
+                elif val in solved:
+                    prefix = "loc_"
+                elif val in non_function_immref:
+                    prefix = "ref_"
+                else:
+                    prefix = ""
+
+                if len(prefix) > 0:
+                    comment = orig_insn
+                    final_insn = re.sub("0x[0-9a-fA-F]*$", prefix + "{:08x}".format(val), final_insn)
+
+            # since now many instructions don't have "ptr" attribute
+            # we need to match the disasm
+            disasm = final_insn
+            # [... + 0x...]
+            m = re.search("\\+ 0x[0-9a-fA-F]+\\]", disasm)
+            if m is not None:
+                ptr = int(disasm[m.start() + 4:m.end() - 1], 16)
             else:
-                prefix = ""
+                # [... - 0x...]
+                m = re.search("- 0x[0-9a-fA-F]+\\]", disasm)
+                if m is not None:
+                    ptr = int(disasm[m.start() + 4:m.end() - 1], 16)
+                    ptr = (1 << 32) - ptr
+                else:
+                    # [0x...]
+                    m = re.search("\\[0x[0-9a-fA-F]+\\]", disasm)
+                    if m is not None:
+                        ptr = int(disasm[m.start() + 3:m.end() - 1], 16)
+                    else:
+                        ptr = None
 
-            if len(prefix) > 0:
-                comment = orig_insn
-                final_insn = re.sub("0x[0-9a-fA-F]*$", prefix + "{:08x}".format(val), final_insn)
-
-        ptr = insn.get("ptr")
-        # note that radare2 set ptr as val for mov instructions
-        # when memory displacement is small and immediate is big
-        if ptr is not None and ptr != val:
-            if ptr < 0:
-                ptr += (1 << 32)
-            elif ptr >= (1 << 32):
-                ptr &= 0xffffffff
-
-            if ptr in non_function_immref:
+            if ptr is not None and ptr in non_function_immref:
                 final_insn = re.sub("- 0x[0-9a-fA-F]*\\]", "+ ref_{:08x}]".format(ptr), final_insn)
                 final_insn = re.sub("\\+ 0x[0-9a-fA-F]*\\]", "+ ref_{:08x}]".format(ptr), final_insn)
                 final_insn = re.sub("0x[0-9a-fA-F]*\\]", "ref_{:08x}]".format(ptr), final_insn)
                 comment = orig_insn
+
 
         if insn["type"] in ["ujmp", "ucall"]:
             if len(comment) > 0:
