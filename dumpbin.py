@@ -84,6 +84,11 @@ for f in Flags:
     if f["name"] == "va":
         BaseAddr = f["offset"]
         r2.cmd("omb. {}".format(BaseAddr))
+    elif "fcn" in f["name"]:
+        # support manually marked functions
+        fcn = f["offset"]
+        unsolved.append(fcn)
+        functions.add(fcn)
 
 EndAddr = BaseAddr + FileSize
 
