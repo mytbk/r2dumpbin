@@ -80,10 +80,13 @@ r2.cmd("e asm.bits = 32")
 
 Flags = r2.cmdj("fj")
 BaseAddr = 0
+HasReloc = False
 for f in Flags:
     if f["name"] == "va":
         BaseAddr = f["offset"]
         r2.cmd("omb. {}".format(BaseAddr))
+    elif f["name"] == "has_reloc":
+        HasReloc = True
     elif "fcn" in f["name"]:
         # support manually marked functions
         fcn = f["offset"]
@@ -138,7 +141,9 @@ while len(unsolved) > 0 or len(speculate) > 0:
                 # it's very rare to do bitwise operation on a reference
                 pass
             else:
-                if insn.get("val") is not None and insn["val"] >= BaseAddr and insn["val"] < EndAddr:
+                if insn.get("val") is not None and \
+                        not HasReloc and \
+                        insn["val"] >= BaseAddr and insn["val"] < EndAddr:
                     immref.add(insn["val"])
 
                 # since now many instructions don't have "ptr" attribute
@@ -165,7 +170,8 @@ while len(unsolved) > 0 or len(speculate) > 0:
                         else:
                             ptr = None
 
-                if ptr is not None and ptr >= BaseAddr and ptr < EndAddr:
+                if ptr is not None and not HasReloc and \
+                        ptr >= BaseAddr and ptr < EndAddr:
                     immref.add(ptr)
 
 
@@ -184,7 +190,7 @@ while len(unsolved) > 0 or len(speculate) > 0:
                     while True:
                         Bytes = r2.cmdj("xj 4 @ {}".format(cur_ptr))
                         loc = (Bytes[3] << 24) | (Bytes[2] << 16) | (Bytes[1] << 8) | Bytes[0]
-                        if loc >= BaseAddr and loc < EndAddr:
+                        if not HasReloc and loc >= BaseAddr and loc < EndAddr:
                             unsolved.append(loc)
                             cur_ptr += 4
                         else:
