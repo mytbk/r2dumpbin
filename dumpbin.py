@@ -401,8 +401,7 @@ while cur < EndAddr:
                     usedd = False
                     break
             if usedd:
-                Bytes = r2.cmdj("xj 4 @ {}".format(cur))
-                val = (Bytes[3] << 24) | (Bytes[2] << 16) | (Bytes[1] << 8) | Bytes[0]
+                val = read32(r2, cur)
                 if not HasReloc or cur in RelocAddr:
                     if val in functions:
                         print("dd fcn_{:08x}".format(val))
@@ -410,6 +409,8 @@ while cur < EndAddr:
                         print("dd loc_{:08x}".format(val))
                     elif val in non_function_immref:
                         print("dd ref_{:08x}".format(val))
+                    else:
+                        print("dd 0x{:08x}".format(val))
                 else:
                     print("dd 0x{:08x}".format(val))
                 cur = cur + 4
