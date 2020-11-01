@@ -347,7 +347,7 @@ str_dict = dict()
 for idx in range(0, len(ref_list) - 1):
     addr = ref_list[idx]
     dist = ref_list[idx + 1] - addr
-    if dist < 4 or dist > 100:
+    if dist < 4 or dist > 200:
         continue
 
     Bytes = r2.cmdj("xj {} @ {}".format(dist, addr))
