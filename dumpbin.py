@@ -235,7 +235,7 @@ while len(unsolved) > 0 or len(speculate) > 0:
                     cur_ptr = ptr
                     while True:
                         loc = read32(r2, cur_ptr)
-                        logging.info("ujmp@{:08x} target is 0x{:08x}".format(
+                        logging.debug("ujmp@{:08x} target is 0x{:08x}".format(
                             insn["offset"], loc))
                         if not HasReloc and loc >= BaseAddr and loc < EndAddr:
                             unsolved.append(loc)
