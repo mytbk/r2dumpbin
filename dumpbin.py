@@ -42,21 +42,30 @@ def hasSubList(heystack, needle):
     return False
 
 
-def goodString(s):
-    end = len(s) - 1
-    if s[end] != 0:
-        return False
-    while end > 0 and s[end] == 0:
-        end = end - 1
-    if end == 0:
-        return False
-    for c in s[0:end]:
+def isAsciiSeq(s):
+    for c in s:
         if c in [ord('\t'), ord('\n'), ord('\r')]:
             continue
         if c >= 0x20 and c < 0x7f:
             continue
         return False
     return True
+
+
+def goodString(s):
+    end = len(s) - 1
+    if s[end] != 0:
+        # if the string is not null terminated, we can still check if it's
+        # an ascii string
+        return isAsciiSeq(s)
+
+    while end > 0 and s[end] == 0:
+        end = end - 1
+
+    if end == 0:
+        return False
+
+    return isAsciiSeq(s[0:end])
 
 
 def toString(s):
