@@ -25,6 +25,12 @@ def get_insns(r2, addr):
     return r2.cmdj("pij 10 @ {}".format(addr))
 
 
+def read32(r2, addr):
+    Bytes = r2.cmdj("xj 4 @ {}".format(addr))
+    val = (Bytes[3] << 24) | (Bytes[2] << 16) | (Bytes[1] << 8) | Bytes[0]
+    return val
+
+
 def hasSubList(heystack, needle):
     L = len(needle)
     idx = 0
@@ -40,8 +46,10 @@ def goodString(s):
     end = len(s) - 1
     if s[end] != 0:
         return False
-    while s[end] == 0:
+    while end > 0 and s[end] == 0:
         end = end - 1
+    if end == 0:
+        return False
     for c in s[0:end]:
         if c in [ord('\t'), ord('\n'), ord('\r')]:
             continue
@@ -57,12 +65,21 @@ def toString(s):
     for c in s:
         if started:
             result += ","
-        if c >= 0x20 and c < 0x7f and c != '\'':
+        if c >= 0x20 and c < 0x7f and chr(c) not in ['\'', '%']:
             result += "'" + chr(c) + "'"
         else:
             result += "0x{:02x}".format(c)
         started = True
     return result.replace("','", "")
+
+
+# get the reloc addresses with:
+# readelf -r refcode.elf | cut -d' ' -f1 | grep '^[0-9]' | sed -e 's/^/0x/g' -e 's/$/,/g'
+def getReloc(fn):
+    f = open(fn, 'r')
+    content = f.read()
+    f.close()
+    return eval('[' + content + ']')
 
 
 r2 = r2pipe.open()
@@ -81,12 +98,16 @@ r2.cmd("e asm.bits = 32")
 Flags = r2.cmdj("fj")
 BaseAddr = 0
 HasReloc = False
+RelocAddr = []
 for f in Flags:
     if f["name"] == "va":
         BaseAddr = f["offset"]
         r2.cmd("omb. {}".format(BaseAddr))
-    elif f["name"] == "has_reloc":
+    elif "reloc:" in f["name"]:
         HasReloc = True
+        reloc_file = f["name"][6:]
+        logging.info("Found reloc file {}.".format(reloc_file))
+        RelocAddr = getReloc(reloc_file)
     elif "fcn" in f["name"]:
         # support manually marked functions
         fcn = f["offset"]
@@ -96,6 +117,22 @@ for f in Flags:
 EndAddr = BaseAddr + FileSize
 
 unsolved.append(BaseAddr)
+
+if HasReloc:
+    for addr in RelocAddr:
+        ref_addr = read32(r2, addr) + BaseAddr
+        immref.add(ref_addr)
+        logging.debug("Add immref 0x{:08x} due to relocation.".format(ref_addr))
+
+
+def isRelocInsn(offset, size):
+    for i in range(0, size):
+        _addr = offset - BaseAddr + i
+        if _addr in RelocAddr:
+            return True
+
+    return False
+
 
 SpecMode = False
 
@@ -188,10 +225,14 @@ while len(unsolved) > 0 or len(speculate) > 0:
                 if ptr is not None and ptr in immref and ptr % 4 == 0:
                     cur_ptr = ptr
                     while True:
-                        Bytes = r2.cmdj("xj 4 @ {}".format(cur_ptr))
-                        loc = (Bytes[3] << 24) | (Bytes[2] << 16) | (Bytes[1] << 8) | Bytes[0]
+                        loc = read32(r2, cur_ptr)
+                        logging.info("ujmp@{:08x} target is 0x{:08x}".format(
+                            insn["offset"], loc))
                         if not HasReloc and loc >= BaseAddr and loc < EndAddr:
                             unsolved.append(loc)
+                            cur_ptr += 4
+                        elif HasReloc and cur_ptr in RelocAddr:
+                            unsolved.append(loc + BaseAddr)
                             cur_ptr += 4
                         else:
                             break
@@ -260,7 +301,9 @@ while cur < EndAddr:
             if usedd:
                 Bytes = r2.cmdj("xj 4 @ {}".format(cur))
                 val = (Bytes[3] << 24) | (Bytes[2] << 16) | (Bytes[1] << 8) | Bytes[0]
-                if val >= BaseAddr and val < EndAddr and not val in solved:
+                if not HasReloc and \
+                        val >= BaseAddr and val < EndAddr and \
+                        not val in solved:
                     non_function_immref.add(val)
 
                 cur = cur + 4
@@ -351,12 +394,13 @@ while cur < EndAddr:
             if usedd:
                 Bytes = r2.cmdj("xj 4 @ {}".format(cur))
                 val = (Bytes[3] << 24) | (Bytes[2] << 16) | (Bytes[1] << 8) | Bytes[0]
-                if val in functions:
-                    print("dd fcn_{:08x}".format(val))
-                elif val in solved:
-                    print("dd loc_{:08x}".format(val))
-                elif val in non_function_immref:
-                    print("dd ref_{:08x}".format(val))
+                if not HasReloc or cur in RelocAddr:
+                    if val in functions:
+                        print("dd fcn_{:08x}".format(val))
+                    elif val in solved:
+                        print("dd loc_{:08x}".format(val))
+                    elif val in non_function_immref:
+                        print("dd ref_{:08x}".format(val))
                 else:
                     print("dd 0x{:08x}".format(val))
                 cur = cur + 4
@@ -383,12 +427,20 @@ while cur < EndAddr:
             # nasm doesn't like "lea r32, dword ..."
             final_insn = orig_insn.replace("dword ", "")
         elif orig_insn[0:4] == "rep ":
+            # rep XXXsX
             comment = orig_insn
             final_insn = orig_insn[0:9]
+        elif orig_insn[0:5] == "repe ":
+            # repe XXXsX
+            comment = orig_insn
+            final_insn = orig_insn[0:10]
         elif orig_insn[0:6] == "pushal":
             final_insn = "pushad"
         elif orig_insn[0:5] == "popal":
             final_insn = "popad"
+        elif orig_insn[0:12] == "clflush byte":
+            # "clflush byte" -> "clflush"
+            final_insn = "clflush " + orig_insn[12:]
         elif insn["type"] in ["jmp", "cjmp", "call"]:
             prefix = ""
             if "jecxz" in orig_insn:
@@ -421,8 +473,10 @@ while cur < EndAddr:
                     prefix = ""
 
                 if len(prefix) > 0:
-                    comment = orig_insn
-                    final_insn = re.sub("0x[0-9a-fA-F]*$", prefix + "{:08x}".format(val), final_insn)
+                    # we also need to check relocation
+                    if not HasReloc or isRelocInsn(insn["offset"], insn["size"]):
+                        comment = orig_insn
+                        final_insn = re.sub("0x[0-9a-fA-F]*$", prefix + "{:08x}".format(val), final_insn)
 
             # since now many instructions don't have "ptr" attribute
             # we need to match the disasm
@@ -446,10 +500,11 @@ while cur < EndAddr:
                         ptr = None
 
             if ptr is not None and ptr in non_function_immref:
-                final_insn = re.sub("- 0x[0-9a-fA-F]*\\]", "+ ref_{:08x}]".format(ptr), final_insn)
-                final_insn = re.sub("\\+ 0x[0-9a-fA-F]*\\]", "+ ref_{:08x}]".format(ptr), final_insn)
-                final_insn = re.sub("0x[0-9a-fA-F]*\\]", "ref_{:08x}]".format(ptr), final_insn)
-                comment = orig_insn
+                if not HasReloc or isRelocInsn(insn["offset"], insn["size"]):
+                    final_insn = re.sub("- 0x[0-9a-fA-F]*\\]", "+ ref_{:08x}]".format(ptr), final_insn)
+                    final_insn = re.sub("\\+ 0x[0-9a-fA-F]*\\]", "+ ref_{:08x}]".format(ptr), final_insn)
+                    final_insn = re.sub("0x[0-9a-fA-F]*\\]", "ref_{:08x}]".format(ptr), final_insn)
+                    comment = orig_insn
 
 
         if insn["type"] in ["ujmp", "ucall"]:
