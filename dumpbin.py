@@ -26,6 +26,7 @@ Aggresive = 2
 class R2BinaryDumper:
     def __init__(self, r2=r2pipe.open(), scripts=["f va @ 0xfffa0000"]):
         self.r2 = r2
+        self.RelocAddr = []
         self.unsolved = []
         self.speculate = set()
         self.speculate_set = set()
@@ -35,6 +36,7 @@ class R2BinaryDumper:
         self.functions = set()
         self.str_dict = dict()
         self.SpecMode = False
+        self.HasReloc = False
 
         for s in scripts:
             r2.cmd(s)
@@ -47,6 +49,11 @@ class R2BinaryDumper:
         val = (Bytes[3] << 24) | (Bytes[2] << 16) | (Bytes[1] << 8) | Bytes[0]
         return val
 
+    def setReloc(self, relocAddrs):
+        self.HasReloc = True
+        self.RelocAddr = relocAddrs
+        logging.info("Found {} relocation addresses.".format(len(self.RelocAddr)))
+
     def init_tool(self):
         self.r2.cmd("e asm.bits = 32")
 
@@ -54,8 +61,6 @@ class R2BinaryDumper:
         self.FileSize = self.r2.cmdj("ij")["core"]["size"]
         self.EndAddr = self.FileSize
 
-        self.HasReloc = False
-        self.RelocAddr = []
 
         Flags = self.r2.cmdj("fj")
         for f in Flags:
@@ -66,8 +71,7 @@ class R2BinaryDumper:
             elif "reloc:" in f["name"]:
                 reloc_file = f["name"][6:]
                 logging.info("Found reloc file {}.".format(reloc_file))
-                self.HasReloc = True
-                self.RelocAddr = getReloc(reloc_file)
+                self.setReloc(getReloc(reloc_file))
             elif "fcn" in f["name"]:
                 # support manually marked functions
                 fcn = f["offset"]
