@@ -515,5 +515,5 @@ class R2BinaryDumper:
 
 
 if __name__ == "__main__":
-    r2dumpbin = R2BinaryDumper()
+    r2dumpbin = R2BinaryDumper(scripts=[])
     r2dumpbin.run_tool()
