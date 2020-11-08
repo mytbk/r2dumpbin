@@ -1,0 +1,19 @@
+#!/usr/bin/env python
+import sys
+import r2pipe
+from dumpbin import R2BinaryDumper
+
+scripts = [
+    "f va @ 0xfffa0000",
+    "f fcn1 @ 0xfffa87da",
+    "f fcn2 @ 0xfffb7579",
+    "f fcn3 @ 0xfffab07d",
+    "f fcn4 @ 0xfffb742b",
+    "f fcn5 @ 0xfffb7458"]
+
+if __name__ == "__main__":
+    r2 = r2pipe.open(sys.argv[1])
+    for s in scripts:
+        r2.cmd(s)
+    r2dumpbin = R2BinaryDumper(r2)
+    r2dumpbin.run_tool()
