@@ -24,7 +24,7 @@ Aggresive = 2
 
 
 class R2BinaryDumper:
-    def __init__(self, r2=r2pipe.open()):
+    def __init__(self, r2=r2pipe.open(), scripts=["f va @ 0xfffa0000"]):
         self.r2 = r2
         self.unsolved = []
         self.speculate = set()
@@ -35,6 +35,9 @@ class R2BinaryDumper:
         self.functions = set()
         self.str_dict = dict()
         self.SpecMode = False
+
+        for s in scripts:
+            r2.cmd(s)
 
     def get_insns(self, addr):
         return self.r2.cmdj("pij 10 @ {}".format(addr))
