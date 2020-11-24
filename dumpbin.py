@@ -37,6 +37,7 @@ class R2BinaryDumper:
         self.str_dict = dict()
         self.SpecMode = False
         self.HasReloc = False
+        self.addr_ranges = []
 
         for s in scripts:
             r2.cmd(s)
@@ -54,13 +55,20 @@ class R2BinaryDumper:
         self.RelocAddr = relocAddrs
         logging.info("Found {} relocation addresses.".format(len(self.RelocAddr)))
 
+    def in_addr_range(self, addr):
+        for r in self.addr_ranges:
+            start, end = r
+            if addr >= start and addr < end:
+                return True
+
+        return False
+
     def init_tool(self):
         self.r2.cmd("e asm.bits = 32")
 
         self.BaseAddr = 0
         self.FileSize = self.r2.cmdj("ij")["core"]["size"]
         self.EndAddr = self.FileSize
-
 
         Flags = self.r2.cmdj("fj")
         for f in Flags:
@@ -77,6 +85,8 @@ class R2BinaryDumper:
                 fcn = f["offset"]
                 self.unsolved.append(fcn)
                 self.functions.add(fcn)
+
+        self.addr_ranges.append((self.BaseAddr, self.EndAddr))
 
         self.unsolved.append(self.BaseAddr)
 
@@ -147,7 +157,7 @@ class R2BinaryDumper:
                 insns = self.get_insns(cur)
 
                 for insn in insns:
-                    if cur >= self.EndAddr:
+                    if not self.in_addr_range(cur):
                         eob = True
                         break
 
@@ -166,7 +176,7 @@ class R2BinaryDumper:
                     else:
                         if insn.get("val") is not None and \
                                 not self.HasReloc and \
-                                insn["val"] >= self.BaseAddr and insn["val"] < self.EndAddr:
+                                self.in_addr_range(insn["val"]):
                             self.immref.add(insn["val"])
 
                         # since now many instructions don't have "ptr" attribute
@@ -196,7 +206,7 @@ class R2BinaryDumper:
                                     ptr = None
 
                         if ptr is not None and not self.HasReloc and \
-                                ptr >= self.BaseAddr and ptr < self.EndAddr:
+                                self.in_addr_range(ptr):
                             self.immref.add(ptr)
 
                     if insn["type"] == "ret":
@@ -215,7 +225,7 @@ class R2BinaryDumper:
                                 loc = self.read32(cur_ptr)
                                 logging.debug("ujmp@{:08x} target is 0x{:08x}".format(
                                     insn["offset"], loc))
-                                if not self.HasReloc and loc >= self.BaseAddr and loc < self.EndAddr:
+                                if not self.HasReloc and self.in_addr_range(loc):
                                     self.unsolved.append(loc)
                                     cur_ptr += 4
                                 elif self.HasReloc and cur_ptr in self.RelocAddr:
@@ -259,12 +269,12 @@ class R2BinaryDumper:
         logging.info("Analyze data references.")
         cur = self.BaseAddr
         eob = True
-        while cur < self.EndAddr:
+        while self.in_addr_range(cur):
             if cur in self.solved:
                 eob = False
 
             if eob:
-                if cur % 4 == 0 and cur + 4 <= self.EndAddr:
+                if cur % 4 == 0 and self.in_addr_range(cur + 3):
                     usedd = True
                     for addr in [cur + 1, cur + 2, cur + 3]:
                         if addr in self.solved or addr in self.non_function_immref \
@@ -274,7 +284,7 @@ class R2BinaryDumper:
                     if usedd:
                         val = self.read32(cur)
                         if not self.HasReloc and \
-                                val >= self.BaseAddr and val < self.EndAddr and \
+                                self.in_addr_range(val) and \
                                 not val in self.solved:
                             self.non_function_immref.add(val)
 
@@ -329,7 +339,7 @@ class R2BinaryDumper:
         print("bits 32")
         print("org 0x{:08x}".format(self.BaseAddr))
 
-        while cur < self.EndAddr:
+        while self.in_addr_range(cur):
             if cur in self.solved:
                 if cur in self.speculate_set:
                     StrSpec = "  ; not directly referenced"
@@ -358,7 +368,7 @@ class R2BinaryDumper:
                     cur += dist
                     continue
 
-                if cur % 4 == 0 and cur + 4 <= self.EndAddr:
+                if cur % 4 == 0 and self.in_addr_range(cur + 3):
                     usedd = True
                     for addr in [cur + 1, cur + 2, cur + 3]:
                         if addr in self.solved or addr in self.non_function_immref \
