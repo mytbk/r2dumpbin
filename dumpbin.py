@@ -263,11 +263,11 @@ class R2BinaryDumper:
         logging.info("Complete analyzing functions.")
         logging.info("{} locations to be printed.".format(len(self.solved)))
 
-    def analyze_immref(self):
+    def analyze_immref(self, addr):
         self.non_function_immref = self.immref.difference(self.solved)
 
-        logging.info("Analyze data references.")
-        cur = self.BaseAddr
+        logging.info("Analyze data references @ 0x{:x}.".format(addr))
+        cur = addr
         eob = True
         while self.in_addr_range(cur):
             if cur in self.solved:
@@ -523,7 +523,10 @@ class R2BinaryDumper:
     def run_tool(self):
         self.init_tool()
         self.analyze_functions()
-        self.analyze_immref()
+        for r in self.addr_ranges:
+            start, end = r
+            self.analyze_immref(start)
+
         self.analyze_ascii_strings()
         self.print_assembly()
 
