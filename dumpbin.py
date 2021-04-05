@@ -68,14 +68,14 @@ class R2BinaryDumper:
 
         self.BaseAddr = 0
         self.FileSize = self.r2.cmdj("ij")["core"]["size"]
-        self.EndAddr = self.FileSize
+        EndAddr = self.FileSize
 
         Flags = self.r2.cmdj("fj")
         for f in Flags:
             if f["name"] == "va":
                 self.BaseAddr = f["offset"]
                 self.r2.cmd("omb. {}".format(self.BaseAddr))
-                self.EndAddr = self.BaseAddr + self.FileSize
+                EndAddr = self.BaseAddr + self.FileSize
             elif "reloc:" in f["name"]:
                 reloc_file = f["name"][6:]
                 logging.info("Found reloc file {}.".format(reloc_file))
@@ -86,7 +86,7 @@ class R2BinaryDumper:
                 self.unsolved.append(fcn)
                 self.functions.add(fcn)
 
-        self.addr_ranges.append((self.BaseAddr, self.EndAddr))
+        self.addr_ranges.append((self.BaseAddr, EndAddr))
 
         self.unsolved.append(self.BaseAddr)
 
@@ -313,8 +313,10 @@ class R2BinaryDumper:
         logging.info("Searching for ASCII strings.")
 
         ref_list = list(self.non_function_immref)
+        for _,end_addr in self.addr_ranges:
+            ref_list.append(end_addr)
+
         ref_list.sort()
-        ref_list.append(self.EndAddr)
 
         for idx in range(0, len(ref_list) - 1):
             addr = ref_list[idx]
