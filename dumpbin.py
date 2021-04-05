@@ -334,13 +334,17 @@ class R2BinaryDumper:
         logging.info("{} ASCII strings found.".format(len(self.str_dict)))
 
     def print_assembly(self):
-        cur = self.BaseAddr
+        print(";; Generated with r2dumpbin (https://github.com/mytbk/r2dumpbin)\n")
+        print("bits 32")
+        for addr,_ in self.addr_ranges:
+            self.print_range(addr)
+
+    def print_range(self, addr):
+        cur = addr
         eob = True
         nsolved = 0
 
-        print(";; Generated with r2dumpbin (https://github.com/mytbk/r2dumpbin)\n")
-        print("bits 32")
-        print("org 0x{:08x}".format(self.BaseAddr))
+        print("org 0x{:08x}".format(addr))
 
         while self.in_addr_range(cur):
             if cur in self.solved:
