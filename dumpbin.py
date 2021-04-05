@@ -166,6 +166,7 @@ class R2BinaryDumper:
                         break
 
                     if insn["type"] == "invalid":
+                        eob = True
                         break
 
                     cur += insn["size"]
