@@ -47,6 +47,12 @@ class R2BinaryDumper:
         self.unsolved.append(fcn)
         self.functions.add(fcn)
 
+    def find_and_mark_functions(self, analyze = 'aaaa'):
+        self.r2.cmd(analyze)
+        fcns = self.r2.cmdj("aflj")
+        for f in fcns:
+            self.mark_function(f["offset"])
+
     def get_insns(self, addr):
         return self.r2.cmdj("pij 10 @ {}".format(addr))
 
@@ -80,6 +86,7 @@ class R2BinaryDumper:
             if f["name"] == "va":
                 self.BaseAddr = f["offset"]
                 self.r2.cmd("omb. {}".format(self.BaseAddr))
+                self.r2.cmd("s {}".format(self.BaseAddr))
                 EndAddr = self.BaseAddr + self.FileSize
             elif "reloc:" in f["name"]:
                 reloc_file = f["name"][6:]
@@ -530,8 +537,9 @@ class R2BinaryDumper:
             logging.info("solved {} functions, but there are {} functions to be solved!".format(
                 nsolved, len(self.solved)))
 
-    def run_tool(self):
+    def run_tool(self, analyze = 'aaaa'):
         self.init_tool()
+        self.find_and_mark_functions(analyze)
         self.analyze_functions()
         for r in self.addr_ranges:
             start, end = r

@@ -5,7 +5,7 @@ import sys
 import r2pipe
 from dumpbin import R2BinaryDumper
 
-fcns = [0xfffa87da, 0xfffb7579, 0xfffab07d, 0xfffb742b, 0xfffb7458, 0xfffd295d]
+fcns = [0xfffa87da, 0xfffab07d, 0xfffb742b, 0xfffd295d]
 
 if __name__ == "__main__":
     r2dumpbin = R2BinaryDumper(r2pipe.open(sys.argv[1]))
