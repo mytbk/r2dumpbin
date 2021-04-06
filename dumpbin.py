@@ -43,6 +43,10 @@ class R2BinaryDumper:
         for s in scripts:
             r2.cmd(s)
 
+    def mark_function(self, fcn):
+        self.unsolved.append(fcn)
+        self.functions.add(fcn)
+
     def get_insns(self, addr):
         return self.r2.cmdj("pij 10 @ {}".format(addr))
 
@@ -84,8 +88,7 @@ class R2BinaryDumper:
             elif "fcn" in f["name"]:
                 # support manually marked functions
                 fcn = f["offset"]
-                self.unsolved.append(fcn)
-                self.functions.add(fcn)
+                self.mark_function(fcn)
 
         self.addr_ranges.append((self.BaseAddr, EndAddr))
 
