@@ -38,6 +38,7 @@ class R2BinaryDumper:
         self.SpecMode = False
         self.HasReloc = False
         self.addr_ranges = []
+        self.pe_imports = {}
 
         for s in scripts:
             r2.cmd(s)
@@ -494,14 +495,13 @@ class R2BinaryDumper:
                             else:
                                 ptr = None
 
-                    if ptr is not None and ptr in self.non_function_immref:
-                        if not self.HasReloc or self.isRelocInsn(insn["offset"], insn["size"]):
-                            final_insn = re.sub(
-                                "- 0x[0-9a-fA-F]*\\]", "+ ref_{:08x}]".format(ptr), final_insn)
-                            final_insn = re.sub(
-                                "\\+ 0x[0-9a-fA-F]*\\]", "+ ref_{:08x}]".format(ptr), final_insn)
-                            final_insn = re.sub(
-                                "0x[0-9a-fA-F]*\\]", "ref_{:08x}]".format(ptr), final_insn)
+                    if ptr is not None:
+                        if ptr in self.non_function_immref:
+                            if not self.HasReloc or self.isRelocInsn(insn["offset"], insn["size"]):
+                                final_insn = ptrSub(final_insn, "ref_{:08x}".format(ptr))
+                                comment = orig_insn
+                        elif ptr in self.pe_imports:
+                            final_insn = ptrSub(final_insn, "__imp__{}".format(self.pe_imports[ptr]["name"]))
                             comment = orig_insn
 
                 if insn["type"] in ["ujmp", "ucall"]:

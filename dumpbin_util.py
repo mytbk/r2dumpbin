@@ -1,6 +1,8 @@
 # Copyright (C)  2018-2020 Iru Cai <mytbk920423@gmail.com>
 # SPDX-License-Identifier: MIT
 
+import re
+
 def hasSubList(heystack, needle):
     L = len(needle)
     idx = 0
@@ -64,3 +66,10 @@ def getReloc(fn):
     content = f.read()
     f.close()
     return eval('[' + content + ']')
+
+def ptrSub(insn, sym):
+    final_insn = insn
+    final_insn = re.sub("- 0x[0-9a-fA-F]*\\]", "+ {}]".format(sym), final_insn)
+    final_insn = re.sub("\\+ 0x[0-9a-fA-F]*\\]", "+ {}]".format(sym), final_insn)
+    final_insn = re.sub("0x[0-9a-fA-F]*\\]", "{}]".format(sym), final_insn)
+    return final_insn
