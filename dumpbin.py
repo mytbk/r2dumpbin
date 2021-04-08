@@ -39,6 +39,7 @@ class R2BinaryDumper:
         self.SpecMode = False
         self.HasReloc = False
         self.addr_ranges = []
+        # pe_imports map: address -> DLL import symbol
         self.pe_imports = {}
 
         for s in scripts:
@@ -473,7 +474,7 @@ class R2BinaryDumper:
                                 final_insn = ptrSub(final_insn, "ref_{:08x}".format(ptr))
                                 comment = orig_insn
                         elif ptr in self.pe_imports:
-                            final_insn = ptrSub(final_insn, "__imp__{}".format(self.pe_imports[ptr]["name"]))
+                            final_insn = ptrSub(final_insn, self.pe_imports[ptr])
                             comment = orig_insn
 
                 if insn["type"] in ["ujmp", "ucall"]:
