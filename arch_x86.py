@@ -17,6 +17,13 @@ def asmfixup(dumper, insn):
         # repe XXXsX
         comment = orig_insn
         final_insn = orig_insn[0:10]
+    elif orig_insn[0:6] == "repne ":
+        # repne XXXsX
+        comment = orig_insn
+        final_insn = orig_insn[0:11]
+    elif orig_insn[0:6] in ["movsb ","movsw ","movsd "]:
+        comment = orig_insn
+        final_insn = orig_insn[0:5]
     elif orig_insn[0:6] == "pushal":
         final_insn = "pushad"
     elif orig_insn[0:5] == "popal":
@@ -43,5 +50,14 @@ def asmfixup(dumper, insn):
         final_insn = re.sub(
             "0x.*", prefix + "{:08x}".format(tgt), orig_insn)
         comment = orig_insn
+    elif orig_insn[0:5] in ["fcom ", "fsub ", "fxch ", "fstp "] or \
+         orig_insn[0:6] in ["fmulp ", "fdivp ", "faddp ", "fsubp "] or \
+         orig_insn[0:4] in ["fld "]:
+        final_insn = orig_insn.replace("xword", "tword") # 80-bit "ten word"
+        final_insn = re.sub("st\(([0-9])\)", "st\\1", final_insn)
+        comment = orig_insn
+
+    if final_insn == orig_insn:
+        comment = ""
 
     return final_insn, comment
