@@ -23,7 +23,9 @@ def asmfixup(dumper, insn):
         # repne XXXsX
         comment = orig_insn
         final_insn = orig_insn[0:11]
-    elif orig_insn[0:6] in ["movsb ","movsw ","movsd "]:
+    elif orig_insn[0:6] in ["movsb ","movsw ","movsd ",
+                            "stosb ", "stosw ", "stosd ",
+                            "lodsb ", "lodsw ", "lodsd "]:
         comment = orig_insn
         final_insn = orig_insn[0:5]
     elif orig_insn[0:6] == "pushal":
