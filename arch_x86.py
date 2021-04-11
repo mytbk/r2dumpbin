@@ -37,7 +37,7 @@ def asmfixup(dumper, insn):
         final_insn = "clflush " + orig_insn[12:]
     elif insn["type"] in ["jmp", "cjmp", "call"]:
         prefix = ""
-        if "jecxz" in orig_insn:
+        if "jecxz" in orig_insn or "loop" in orig_insn:
             pass
         elif insn["type"] != "call":
             if insn["size"] == 2:
@@ -60,6 +60,8 @@ def asmfixup(dumper, insn):
         final_insn = orig_insn.replace("xword", "tword") # 80-bit "ten word"
         final_insn = re.sub("st\(([0-9])\)", "st\\1", final_insn)
         comment = orig_insn
+    elif orig_insn[0:7] in ["fnstsw "]:
+        final_insn = orig_insn.replace(" dword", "")
 
     # fix addressing expressions with a segment selector
     final_insn = segmem_expr.sub('[\\1:\\2]', final_insn)
