@@ -469,13 +469,13 @@ class R2BinaryDumper:
                                 ptr = None
 
                     if ptr is not None:
-                        if ptr in self.non_function_immref:
+                        if ptr in self.pe_imports:
+                            final_insn = ptrSub(final_insn, self.pe_imports[ptr])
+                            comment = orig_insn
+                        elif ptr in self.non_function_immref:
                             if not self.HasReloc or self.isRelocInsn(insn["offset"], insn["size"]):
                                 final_insn = ptrSub(final_insn, "ref_{:08x}".format(ptr))
                                 comment = orig_insn
-                        elif ptr in self.pe_imports:
-                            final_insn = ptrSub(final_insn, self.pe_imports[ptr])
-                            comment = orig_insn
 
                 if insn["type"] in ["ujmp", "ucall"]:
                     if len(comment) > 0:
