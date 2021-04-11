@@ -1,5 +1,7 @@
 import re
 
+segmem_expr = re.compile('(cs|ds|es|ss|fs|gs):\[(.*)\]')
+
 def asmfixup(dumper, insn):
     orig_insn = insn["opcode"]
     final_insn = orig_insn
@@ -56,6 +58,9 @@ def asmfixup(dumper, insn):
         final_insn = orig_insn.replace("xword", "tword") # 80-bit "ten word"
         final_insn = re.sub("st\(([0-9])\)", "st\\1", final_insn)
         comment = orig_insn
+
+    # fix addressing expressions with a segment selector
+    final_insn = segmem_expr.sub('[\\1:\\2]', final_insn)
 
     if final_insn == orig_insn:
         comment = ""

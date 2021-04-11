@@ -461,10 +461,10 @@ class R2BinaryDumper:
                             ptr = (1 << 32) - ptr
                         else:
                             # [0x...]
-                            m = re.search("\\[0x[0-9a-fA-F]+\\]", disasm)
+                            m = re.search("0x[0-9a-fA-F]+\\]", disasm)
                             if m is not None:
                                 ptr = int(
-                                    disasm[m.start() + 3:m.end() - 1], 16)
+                                    disasm[m.start() + 2:m.end() - 1], 16)
                             else:
                                 ptr = None
 
