@@ -232,8 +232,10 @@ class R2BinaryDumper:
                         eob = True
                         break
 
-                    if insn["type"] == "ujmp":
-                        if ptr is not None and ptr in self.immref and ptr % 4 == 0:
+                    # find jump/call table
+                    if insn["type"] in ["ujmp", "ucall"] and "*4" in insn["opcode"]:
+                        if ptr is not None and self.in_addr_range(ptr):
+                            self.immref.add(ptr)
                             cur_ptr = ptr
                             while True:
                                 loc = self.read32(cur_ptr)
@@ -247,6 +249,8 @@ class R2BinaryDumper:
                                     cur_ptr += 4
                                 else:
                                     break
+
+                    if insn["type"] == "ujmp":
                         eob = True
                         break
 
@@ -388,13 +392,17 @@ class R2BinaryDumper:
                     cur += dist
                     continue
 
-                if cur % 4 == 0 and self.in_addr_range(cur + 3):
+                if self.in_addr_range(cur + 3):
+                    # check if we should interpret a 32-bit word here
                     usedd = True
+
+                    # there's some known label in the 4 bytes, not a word
                     for addr in [cur + 1, cur + 2, cur + 3]:
                         if addr in self.solved or addr in self.non_function_immref \
                                 or addr in self.endaddrs:
                             usedd = False
                             break
+
                     if usedd:
                         val = self.read32(cur)
                         if not self.HasReloc or cur in self.RelocAddr:
@@ -404,13 +412,16 @@ class R2BinaryDumper:
                                 print("dd loc_{:08x}".format(val))
                             elif val in self.non_function_immref:
                                 print("dd ref_{:08x}".format(val))
-                            else:
+                            elif cur % 4 == 0:
                                 print("dd 0x{:08x}".format(val))
-                        else:
-                            print("dd 0x{:08x}".format(val))
-                        cur = cur + 4
-                        continue
+                            else:
+                                usedd = False
 
+                        if usedd:
+                            cur = cur + 4
+                            continue
+
+                # we don't write 32-bit word, use db
                 Byte = self.r2.cmdj("xj 1 @ {}".format(cur))[0]
                 print("db 0x{:02x}".format(Byte))
                 cur = cur + 1
