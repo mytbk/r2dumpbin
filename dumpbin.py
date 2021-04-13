@@ -233,7 +233,7 @@ class R2BinaryDumper:
                         break
 
                     # find jump/call table
-                    if insn["type"] in ["ujmp", "ucall"] and "*4" in insn["opcode"]:
+                    if insn["type"] in ["ujmp", "ucall"]:
                         if ptr is not None and self.in_addr_range(ptr):
                             self.immref.add(ptr)
                             cur_ptr = ptr
