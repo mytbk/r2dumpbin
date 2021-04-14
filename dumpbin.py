@@ -34,6 +34,7 @@ class R2BinaryDumper:
         self.solved = set()
         self.endaddrs = set()
         self.immref = set()
+        self.jumptab = set()
         self.functions = set()
         self.str_dict = dict()
         self.SpecMode = False
@@ -236,6 +237,7 @@ class R2BinaryDumper:
                     if insn["type"] in ["ujmp", "ucall"]:
                         if ptr is not None and self.in_addr_range(ptr):
                             self.immref.add(ptr)
+                            self.jumptab.add(ptr)
                             cur_ptr = ptr
                             while True:
                                 loc = self.read32(cur_ptr)
@@ -379,8 +381,12 @@ class R2BinaryDumper:
                 nsolved = nsolved + 1
                 eob = False
             elif cur in self.non_function_immref:
-                print("")
-                print("ref_{:08x}:".format(cur))
+                if cur in self.jumptab:
+                    comment = "  ; may contain a jump table"
+                else:
+                    comment = ""
+
+                print("\nref_{:08x}:{}".format(cur, comment))
             elif cur in self.endaddrs:
                 print("")
                 print("loc_{:08x}:".format(cur))
