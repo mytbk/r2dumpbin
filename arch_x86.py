@@ -25,7 +25,8 @@ def asmfixup(dumper, insn):
         final_insn = orig_insn[0:11]
     elif orig_insn[0:6] in ["movsb ","movsw ","movsd ",
                             "stosb ", "stosw ", "stosd ",
-                            "lodsb ", "lodsw ", "lodsd "]:
+                            "lodsb ", "lodsw ", "lodsd ",
+                            "cmpsb ", "cmpsw ", "compsd"]:
         comment = orig_insn
         final_insn = orig_insn[0:5]
     elif orig_insn[0:6] == "pushal":
@@ -56,7 +57,8 @@ def asmfixup(dumper, insn):
         comment = orig_insn
     elif orig_insn[0:5] in ["fcom ", "fsub ", "fxch ", "fstp "] or \
          orig_insn[0:6] in ["fmulp ", "fdivp ", "faddp ", "fsubp "] or \
-         orig_insn[0:4] in ["fld "]:
+         orig_insn[0:4] in ["fld "] or \
+         orig_insn[0:7] in ["fdivrp "]:
         final_insn = orig_insn.replace("xword", "tword") # 80-bit "ten word"
         final_insn = re.sub("st\(([0-9])\)", "st\\1", final_insn)
         comment = orig_insn
