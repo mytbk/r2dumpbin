@@ -21,6 +21,12 @@ from arch_x86 import asmfixup
 
 logging.basicConfig(level=logging.INFO)
 
+asmlog = logging.getLogger('asm')
+asmlog.setLevel(logging.INFO)
+
+alog = logging.getLogger('analysis')
+alog.setLevel(logging.INFO)
+
 Aggresive = 2
 
 
@@ -155,7 +161,7 @@ class R2BinaryDumper:
                 if len(self.unsolved) == 0:
                     break
 
-                logging.debug("Analyze indirect functions.")
+                alog.debug("Analyze indirect functions.")
 
             cur = self.unsolved[0]
             eob = False
@@ -167,7 +173,7 @@ class R2BinaryDumper:
             if self.SpecMode:
                 self.speculate_set.add(cur)
 
-            logging.debug("Analyzing {:08x}".format(cur))
+            alog.debug("Analyzing {:08x}".format(cur))
 
             while not eob:
                 insns = self.get_insns(cur)
@@ -202,13 +208,13 @@ class R2BinaryDumper:
                         # [... + 0x...]
                         m = re.search("\\+ 0x[0-9a-fA-F]+\\]", disasm)
                         if m is not None:
-                            logging.debug(disasm)
+                            asmlog.debug(disasm)
                             ptr = int(disasm[m.start() + 4:m.end() - 1], 16)
                         else:
                             # [... - 0x...]
                             m = re.search("- 0x[0-9a-fA-F]+\\]", disasm)
                             if m is not None:
-                                logging.debug(disasm)
+                                asmlog.debug(disasm)
                                 ptr = int(
                                     disasm[m.start() + 4:m.end() - 1], 16)
                                 ptr = (1 << 32) - ptr
@@ -216,7 +222,7 @@ class R2BinaryDumper:
                                 # [0x...]
                                 m = re.search("\\[0x[0-9a-fA-F]+\\]", disasm)
                                 if m is not None:
-                                    logging.debug(disasm)
+                                    asmlog.debug(disasm)
                                     ptr = int(
                                         disasm[m.start() + 3:m.end() - 1], 16)
                                 else:
@@ -231,6 +237,7 @@ class R2BinaryDumper:
                         break
 
                     if insn["type"] == "jmp":
+                        alog.debug("jump from 0x%08x to 0x%08x", insn["offset"], insn["jump"])
                         self.unsolved.append(insn["jump"])
                         eob = True
                         break
@@ -243,7 +250,7 @@ class R2BinaryDumper:
                             cur_ptr = ptr
                             while True:
                                 loc = self.read32(cur_ptr)
-                                logging.debug("ujmp@{:08x} target is 0x{:08x}".format(
+                                alog.debug("ujmp@{:08x} target is 0x{:08x}".format(
                                     insn["offset"], loc))
                                 if not self.HasReloc and self.in_addr_range(loc):
                                     self.unsolved.append(loc)
@@ -259,9 +266,11 @@ class R2BinaryDumper:
                         break
 
                     if insn["type"] == "cjmp":
+                        alog.debug("conditional jump from 0x%08x to 0x%08x", insn["offset"], insn["jump"])
                         self.unsolved.append(insn["jump"])
 
                     if insn["type"] == "call":
+                        alog.debug("call from 0x%08x to 0x%08x", insn["offset"], insn["jump"])
                         self.unsolved.append(insn["jump"])
                         self.functions.add(insn["jump"])
 
@@ -288,7 +297,7 @@ class R2BinaryDumper:
     def analyze_immref(self, addr):
         self.non_function_immref = self.immref.difference(self.solved)
 
-        logging.info("Analyze data references @ 0x{:x}.".format(addr))
+        alog.info("Analyze data references @ 0x{:x}.".format(addr))
         cur = addr
         eob = True
         while self.in_addr_range(cur):
@@ -347,7 +356,7 @@ class R2BinaryDumper:
                 continue
 
             Bytes = self.r2.cmdj("xj {} @ {}".format(dist, addr))
-            logging.debug(
+            alog.debug(
                 "dist = {}, addr = {}, Bytes = {}".format(dist, addr, Bytes))
             if goodString(Bytes):
                 self.str_dict[addr] = (toString(Bytes), dist)
