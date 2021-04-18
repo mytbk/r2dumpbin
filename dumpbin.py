@@ -47,6 +47,7 @@ class R2BinaryDumper:
         self.non_function_labels = set()
         self.SpecMode = False
         self.HasReloc = False
+        self.code_ranges = []
         self.addr_ranges = []
         # pe_imports map: address -> DLL import symbol
         self.pe_imports = {}
@@ -85,6 +86,13 @@ class R2BinaryDumper:
 
         return False
 
+    def in_code_range(self, addr):
+        for (start,end) in self.code_ranges:
+            if addr >= start and addr < end:
+                return True
+
+        return False
+
     def init_tool(self):
         self.r2.cmd("e asm.bits = 32")
 
@@ -109,6 +117,7 @@ class R2BinaryDumper:
                 self.mark_function(fcn)
 
         self.addr_ranges.append((self.BaseAddr, EndAddr))
+        self.code_ranges.append((self.BaseAddr, EndAddr))
 
         self.unsolved.append(self.BaseAddr)
 
@@ -179,7 +188,7 @@ class R2BinaryDumper:
                 insns = self.get_insns(cur)
 
                 for insn in insns:
-                    if not self.in_addr_range(cur):
+                    if not self.in_code_range(cur):
                         eob = True
                         break
 
@@ -250,16 +259,19 @@ class R2BinaryDumper:
                             cur_ptr = ptr
                             while True:
                                 loc = self.read32(cur_ptr)
-                                alog.debug("ujmp@{:08x} target is 0x{:08x}".format(
-                                    insn["offset"], loc))
-                                if not self.HasReloc and self.in_addr_range(loc):
+                                if not self.HasReloc and self.in_code_range(loc):
                                     self.unsolved.append(loc)
-                                    cur_ptr += 4
-                                elif self.HasReloc and cur_ptr in self.RelocAddr:
-                                    self.unsolved.append(loc + self.BaseAddr)
-                                    cur_ptr += 4
+                                elif self.HasReloc and cur_ptr in self.RelocAddr \
+                                     and self.in_code_range(loc + self.BaseAddr):
+                                    loc += self.BaseAddr
+                                    self.unsolved.append(loc)
                                 else:
                                     break
+
+                                alog.debug("%s@%08x target is 0x%08x", insn["type"], insn["offset"], loc)
+                                cur_ptr += 4
+                                if insn["type"] == "ucall":
+                                    self.functions.add(loc)
 
                     if insn["type"] == "ujmp":
                         eob = True
