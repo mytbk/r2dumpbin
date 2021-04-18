@@ -424,7 +424,7 @@ class R2BinaryDumper:
                 print("\nref_{:08x}:{}".format(cur, comment))
             elif cur in self.endaddrs:
                 print("")
-                print("loc_{:08x}:".format(cur))
+                print("endloc_{:08x}:".format(cur))
 
             if eob:
                 if self.str_dict.get(cur) is not None:
