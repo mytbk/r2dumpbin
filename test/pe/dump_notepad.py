@@ -47,6 +47,7 @@ class TestDumper(R2BinaryDumper):
             self.analyze_immref(start)
 
         self.analyze_ascii_strings()
+        self.scan_labels()
         self.print_assembly()
 
 if __name__ == "__main__":

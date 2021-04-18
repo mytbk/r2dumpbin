@@ -32,11 +32,13 @@ class R2BinaryDumper:
         self.speculate = set()
         self.speculate_set = set()
         self.solved = set()
+        # end addresses of code blocks
         self.endaddrs = set()
         self.immref = set()
         self.jumptab = set()
         self.functions = set()
         self.str_dict = dict()
+        self.non_function_labels = set()
         self.SpecMode = False
         self.HasReloc = False
         self.addr_ranges = []
@@ -352,6 +354,39 @@ class R2BinaryDumper:
 
         logging.info("{} ASCII strings found.".format(len(self.str_dict)))
 
+    def scan_labels(self):
+        # a quick print pass to find all non function assembly labels,
+        # thus avoid printing invalid non_function_immref items
+        self.non_function_labels = set()
+        for addr,_ in self.addr_ranges:
+            self.scan_labels_range(addr)
+
+    def scan_labels_range(self,addr):
+        cur = addr
+        eob = True
+
+        while self.in_addr_range(cur):
+            if cur in self.solved:
+                eob = False
+            elif cur in self.non_function_immref:
+                self.non_function_labels.add(cur)
+
+            if eob:
+                cur = cur + 1
+                continue
+
+            insns = self.get_insns(cur)
+            for insn in insns:
+                if insn["type"] == "invalid":
+                    break
+
+                cur += insn["size"]
+
+                if cur in self.solved or cur in self.endaddrs:
+                    eob = True
+                    break
+
+
     def print_assembly(self):
         print(";; Generated with r2dumpbin (https://github.com/mytbk/r2dumpbin)\n")
         print("bits 32")
@@ -380,7 +415,7 @@ class R2BinaryDumper:
                 print(prefix + "{:08x}:".format(cur) + StrSpec)
                 nsolved = nsolved + 1
                 eob = False
-            elif cur in self.non_function_immref:
+            elif cur in self.non_function_labels:
                 if cur in self.jumptab:
                     comment = "  ; may contain a jump table"
                 else:
@@ -404,7 +439,7 @@ class R2BinaryDumper:
 
                     # there's some known label in the 4 bytes, not a word
                     for addr in [cur + 1, cur + 2, cur + 3]:
-                        if addr in self.solved or addr in self.non_function_immref \
+                        if addr in self.solved or addr in self.non_function_labels \
                                 or addr in self.endaddrs:
                             usedd = False
                             break
@@ -416,7 +451,7 @@ class R2BinaryDumper:
                                 print("dd fcn_{:08x}".format(val))
                             elif val in self.solved:
                                 print("dd loc_{:08x}".format(val))
-                            elif val in self.non_function_immref:
+                            elif val in self.non_function_labels:
                                 print("dd ref_{:08x}".format(val))
                             elif cur % 4 == 0:
                                 print("dd 0x{:08x}".format(val))
@@ -451,7 +486,7 @@ class R2BinaryDumper:
                             prefix = "fcn_"
                         elif val in self.solved:
                             prefix = "loc_"
-                        elif val in self.non_function_immref:
+                        elif val in self.non_function_labels:
                             prefix = "ref_"
                         else:
                             prefix = ""
@@ -489,7 +524,7 @@ class R2BinaryDumper:
                         if ptr in self.pe_imports:
                             final_insn = ptrSub(final_insn, self.pe_imports[ptr])
                             comment = orig_insn
-                        elif ptr in self.non_function_immref:
+                        elif ptr in self.non_function_labels:
                             if not self.HasReloc or self.isRelocInsn(insn["offset"], insn["size"]):
                                 final_insn = ptrSub(final_insn, "ref_{:08x}".format(ptr))
                                 comment = orig_insn
@@ -526,6 +561,7 @@ class R2BinaryDumper:
             self.analyze_immref(start)
 
         self.analyze_ascii_strings()
+        self.scan_labels()
         self.print_assembly()
 
 
