@@ -121,7 +121,7 @@ extern __imp__TranslateMessage@4
 extern __imp__UpdateWindow@4
 extern __imp__WinHelpW@16
 extern __imp__wsprintfW
-; link libs: -lkernel32 -ladvapi32 -lcomdlg32 -lgdi32 -lshell32 -lshlwapi -lucrtbase -luser32
+; link flag and libs: -e fcn_00406a20 -lkernel32 -ladvapi32 -lcomdlg32 -lgdi32 -lshell32 -lshlwapi -lucrtbase -luser32
 org 0x00401000
 
 fcn_00401000:
@@ -159,7 +159,7 @@ pop ebp
 lea esp, [ecx - 4]
 ret 0x10
 
-loc_00401055:
+endloc_00401055:
 db 0x8d
 db 0x76
 db 0x00
@@ -235,7 +235,7 @@ pop ebp
 lea esp, [ecx - 4]
 ret 0x10
 
-loc_0040116a:
+endloc_0040116a:
 db 0x8d
 db 0xb6
 dd 0x00000000
@@ -292,7 +292,7 @@ mov edx, 1
 sub esp, 8
 jmp near loc_00401046  ; jmp 0x401046
 
-loc_0040127f:
+endloc_0040127f:
 db 0x90
 
 loc_00401280:
@@ -303,7 +303,7 @@ mov edx, 1
 sub esp, 8
 jmp near loc_00401046  ; jmp 0x401046
 
-loc_0040129d:
+endloc_0040129d:
 db 0x8d
 db 0x76
 db 0x00
@@ -319,7 +319,7 @@ mov edx, 1
 sub esp, 0x10
 jmp near loc_00401046  ; jmp 0x401046
 
-loc_004012d2:
+endloc_004012d2:
 db 0x8d
 db 0xb4
 dd 0x00000026
@@ -404,7 +404,7 @@ pop edi
 pop ebp
 ret
 
-loc_0040139e:
+endloc_0040139e:
 db 0x66
 db 0x90
 
@@ -417,7 +417,7 @@ loc_004013a9:
 xor eax, eax
 jmp short loc_00401345  ; jmp 0x401345
 
-loc_004013ad:
+endloc_004013ad:
 db 0x8d
 db 0x76
 db 0x00
@@ -426,7 +426,7 @@ loc_004013b0:
 xor eax, eax
 jmp near loc_0040130d  ; jmp 0x40130d
 
-loc_004013b7:
+endloc_004013b7:
 db 0x8d
 dd 0x000026b4
 dd 0x90660000
@@ -513,7 +513,7 @@ pop edi
 pop ebp
 ret
 
-loc_0040150f:
+endloc_0040150f:
 db 0x90
 
 fcn_00401510:
@@ -549,7 +549,7 @@ pop ebp
 lea esp, [ecx - 4]
 ret 0x10
 
-loc_0040155d:
+endloc_0040155d:
 db 0x8d
 db 0x76
 db 0x00
@@ -676,7 +676,7 @@ call dword [__imp__CloseHandle@4]  ; ucall: call dword [0x40c2b4]
 sub esp, 4
 jmp near loc_0040154d  ; jmp 0x40154d
 
-loc_00401751:
+endloc_00401751:
 db 0x8d
 db 0xb4
 db 0x26
@@ -701,7 +701,7 @@ cmove eax, edx
 mov dword [ref_0040ad7c], eax  ; mov dword [0x40ad7c], eax
 jmp near loc_0040154d  ; jmp 0x40154d
 
-loc_004017ac:
+endloc_004017ac:
 dd 0x0026748d
 
 loc_004017b0:
@@ -741,7 +741,7 @@ pop ebp
 lea esp, [ecx - 4]
 ret 0x10
 
-loc_00401831:
+endloc_00401831:
 db 0x8d
 db 0xb4
 db 0x26
@@ -824,7 +824,7 @@ jmp near loc_0040154d  ; jmp 0x40154d
 fcn_00401930:
 push esi
 push ebx
-mov eax, dword fs:[0x18]
+mov eax, dword [fs:0x18]
 sub esp, 0x234
 mov ebx, dword [eax + 0x34]
 test ebx, ebx
@@ -834,7 +834,7 @@ pop ebx
 pop esi
 ret
 
-loc_0040194e:
+endloc_0040194e:
 db 0x66
 db 0x90
 
@@ -879,7 +879,7 @@ push edi
 push esi
 mov esi, edx
 push ebx
-mov edi, dword fs:[0x18]
+mov edi, dword [fs:0x18]
 sub esp, 0x4c
 mov dword [esp + 0x20], eax
 mov eax, dword [ref_0040a02c]  ; mov eax, dword [0x40a02c]
@@ -954,7 +954,7 @@ sub esp, 0x20
 mov esi, eax
 mov dword [esp + 8], eax
 mov dword [esp + 4], 0
-mov edi, dword fs:[0x18]
+mov edi, dword [fs:0x18]
 mov eax, dword [edi + 0x30]
 mov eax, dword [eax + 0x18]
 mov dword [esp], eax
@@ -988,7 +988,7 @@ mov ecx, dword [esp + 0x28]
 mov ebx, ecx
 jmp short loc_00401bf5  ; jmp 0x401bf5
 
-loc_00401bcd:
+endloc_00401bcd:
 db 0x8d
 db 0x76
 db 0x00
@@ -1043,7 +1043,7 @@ call dword [__imp__CloseHandle@4]  ; ucall: call dword [0x40c2b4]
 sub esp, 4
 mov dword [esp + 8], ebx
 mov dword [esp + 4], 0
-mov eax, dword fs:[0x18]
+mov eax, dword [fs:0x18]
 mov eax, dword [eax + 0x30]
 mov eax, dword [eax + 0x18]
 mov dword [esp], eax
@@ -1066,7 +1066,7 @@ pop edi
 pop ebp
 ret
 
-loc_00401cd2:
+endloc_00401cd2:
 db 0x8d
 db 0xb6
 dd 0x00000000
@@ -1080,7 +1080,7 @@ sub esp, 4
 loc_00401ce9:
 mov dword [esp + 8], ebx
 mov dword [esp + 4], 0
-mov eax, dword fs:[0x18]
+mov eax, dword [fs:0x18]
 mov eax, dword [eax + 0x30]
 mov eax, dword [eax + 0x18]
 mov dword [esp], eax
@@ -1094,7 +1094,7 @@ pop edi
 pop ebp
 ret
 
-loc_00401d16:
+endloc_00401d16:
 db 0x8d
 db 0xb4
 dd 0x00000026
@@ -1150,7 +1150,7 @@ mov ecx, dword [esp + 0x24]
 mov ebx, ecx
 jmp near loc_00401bf5  ; jmp 0x401bf5
 
-loc_00401df5:
+endloc_00401df5:
 db 0x8d
 db 0x76
 db 0x00
@@ -1171,7 +1171,7 @@ mov eax, 2
 sub esp, 0xc
 jmp near loc_00401cca  ; jmp 0x401cca
 
-loc_00401e36:
+endloc_00401e36:
 db 0x8d
 db 0xb4
 dd 0x00000026
@@ -1189,7 +1189,7 @@ mov eax, 1
 sub esp, 0xc
 jmp near loc_00401cca  ; jmp 0x401cca
 
-loc_00401e6d:
+endloc_00401e6d:
 db 0x8d
 db 0x76
 db 0x00
@@ -1204,7 +1204,7 @@ pop edi
 pop ebp
 ret
 
-loc_00401e82:
+endloc_00401e82:
 db 0x8d
 db 0xb6
 dd 0x00000000
@@ -1213,7 +1213,7 @@ loc_00401e88:
 call fcn_00401930  ; call 0x401930
 jmp near loc_00401ce9  ; jmp 0x401ce9
 
-loc_00401e92:
+endloc_00401e92:
 db 0x8d
 db 0xb4
 dd 0x00000026
@@ -1232,7 +1232,7 @@ xor eax, eax
 lea esi, [esp + 0x90]
 jmp short loc_00401ed7  ; jmp 0x401ed7
 
-loc_00401ec9:
+endloc_00401ec9:
 db 0x8d
 db 0xb4
 db 0x26
@@ -1271,7 +1271,7 @@ xor eax, eax
 mov ecx, 0x20
 jmp short loc_00401f37  ; jmp 0x401f37
 
-loc_00401f2a:
+endloc_00401f2a:
 db 0x8d
 db 0xb6
 dd 0x00000000
@@ -1314,7 +1314,7 @@ pop ebx
 pop esi
 ret
 
-loc_00401f8d:
+endloc_00401f8d:
 db 0x8d
 db 0x76
 db 0x00
@@ -1330,7 +1330,7 @@ mov ecx, dword [ref_0040a020]  ; mov ecx, dword [0x40a020]
 sub esp, 0x10
 jmp near loc_00401ee3  ; jmp 0x401ee3
 
-loc_00401fc1:
+endloc_00401fc1:
 db 0x8d
 db 0xb4
 db 0x26
@@ -1390,7 +1390,7 @@ pop edi
 pop ebp
 ret
 
-loc_00402094:
+endloc_00402094:
 dd 0x0026748d
 
 loc_00402098:
@@ -1401,7 +1401,7 @@ call fcn_00406898  ; call 0x406898
 sub esp, 0x10
 jmp short loc_00402069  ; jmp 0x402069
 
-loc_004020b2:
+endloc_004020b2:
 db 0x8d
 db 0xb4
 dd 0x00000026
@@ -1431,7 +1431,7 @@ add esp, 0x218
 pop ebx
 ret
 
-loc_00402127:
+endloc_00402127:
 db 0x8d
 dd 0x000026b4
 dd 0x90660000
@@ -1468,7 +1468,7 @@ mov edx, 0x2a
 rep stosd  ; rep stosd dword es:[edi], eax
 jmp short loc_00402197  ; jmp 0x402197
 
-loc_0040218e:
+endloc_0040218e:
 db 0x66
 db 0x90
 
@@ -1532,7 +1532,7 @@ pop ebx
 pop edi
 ret
 
-loc_00402268:
+endloc_00402268:
 dd 0x0026b48d
 dd 0x90000000
 
@@ -1551,7 +1551,7 @@ xor eax, eax
 add esp, 0xc
 ret
 
-loc_0040229c:
+endloc_0040229c:
 dd 0x0026748d
 
 loc_004022a0:
@@ -1560,7 +1560,7 @@ add esp, 0xc
 loc_004022a3:
 jmp near fcn_00402170  ; jmp 0x402170
 
-loc_004022a8:
+endloc_004022a8:
 dd 0x0026b48d
 dd 0x90000000
 
@@ -1569,7 +1569,7 @@ mov eax, 1
 add esp, 0xc
 ret
 
-loc_004022b9:
+endloc_004022b9:
 db 0x8d
 db 0xb4
 db 0x26
@@ -1608,7 +1608,7 @@ xor eax, eax
 pop ebx
 ret
 
-loc_00402326:
+endloc_00402326:
 db 0x8d
 db 0xb4
 dd 0x00000026
@@ -1624,7 +1624,7 @@ mov eax, 1
 pop ebx
 ret
 
-loc_00402353:
+endloc_00402353:
 db 0x8d
 dd 0x90002674
 
@@ -1633,7 +1633,7 @@ add esp, 0x18
 pop ebx
 jmp near fcn_00402270  ; jmp 0x402270
 
-loc_00402361:
+endloc_00402361:
 db 0x8d
 db 0xb4
 db 0x26
@@ -1669,7 +1669,7 @@ sub esp, 4
 add esp, 0x1c
 ret
 
-loc_004023d4:
+endloc_004023d4:
 dd 0x0026b48d
 dd 0x8d000000
 dd 0x90002674
@@ -1759,7 +1759,7 @@ sub esp, 4
 lea edx, [ebx + ebx]
 mov dword [esp + 4], 0
 mov dword [esp + 8], edx
-mov eax, dword fs:[0x18]
+mov eax, dword [fs:0x18]
 mov eax, dword [eax + 0x30]
 mov eax, dword [eax + 0x18]
 mov dword [esp], eax
@@ -1794,7 +1794,7 @@ call fcn_004069d8  ; call 0x4069d8
 sub esp, 4
 mov edi, dword [esp + 0x44]
 mov dword [esp + 4], 0
-mov eax, dword fs:[0x18]
+mov eax, dword [fs:0x18]
 mov dword [esp + 8], edi
 mov eax, dword [eax + 0x30]
 mov eax, dword [eax + 0x18]
@@ -1988,7 +1988,7 @@ lea edx, [ecx + ecx + 2]
 loc_004028f7:
 mov dword [esp + 8], edx
 mov dword [esp + 4], 0
-mov eax, dword fs:[0x18]
+mov eax, dword [fs:0x18]
 mov eax, dword [eax + 0x30]
 mov eax, dword [eax + 0x18]
 mov dword [esp], eax
@@ -2012,7 +2012,7 @@ mov dword [esp + 0x38], esi
 xor esi, esi
 jmp short loc_00402979  ; jmp 0x402979
 
-loc_00402954:
+endloc_00402954:
 dd 0x0026748d
 
 loc_00402958:
@@ -2144,7 +2144,7 @@ cmp edi, ebp
 ja short loc_00402b06  ; ja 0x402b06
 jmp near loc_00402f30  ; jmp 0x402f30
 
-loc_00402ae1:
+endloc_00402ae1:
 db 0x8d
 db 0xb4
 db 0x26
@@ -2230,7 +2230,7 @@ cmp ebx, edx
 jl loc_00402a48  ; jl 0x402a48
 jmp near loc_00402d42  ; jmp 0x402d42
 
-loc_00402bfd:
+endloc_00402bfd:
 db 0x8d
 db 0x76
 db 0x00
@@ -2240,7 +2240,7 @@ add ecx, 1
 xor ebx, ebx
 jmp near loc_004028c8  ; jmp 0x4028c8
 
-loc_00402c0a:
+endloc_00402c0a:
 db 0x8d
 db 0xb6
 dd 0x00000000
@@ -2249,7 +2249,7 @@ loc_00402c10:
 mov ebx, 1
 jmp near loc_004028c8  ; jmp 0x4028c8
 
-loc_00402c1a:
+endloc_00402c1a:
 db 0x8d
 db 0xb6
 dd 0x00000000
@@ -2262,7 +2262,7 @@ lea ecx, [ebp + edx + 2]
 xor edi, edi
 jmp near loc_0040296e  ; jmp 0x40296e
 
-loc_00402c36:
+endloc_00402c36:
 db 0x8d
 db 0xb4
 dd 0x00000026
@@ -2272,7 +2272,7 @@ loc_00402c40:
 mov edi, 1
 jmp near loc_0040296e  ; jmp 0x40296e
 
-loc_00402c4a:
+endloc_00402c4a:
 db 0x8d
 db 0xb6
 dd 0x00000000
@@ -2299,7 +2299,7 @@ add eax, eax
 sub edx, eax
 jmp near loc_00402a48  ; jmp 0x402a48
 
-loc_00402c98:
+endloc_00402c98:
 dd 0x0026b48d
 dd 0x90000000
 
@@ -2307,7 +2307,7 @@ loc_00402ca0:
 mov eax, 8
 jmp short loc_00402cc6  ; jmp 0x402cc6
 
-loc_00402ca7:
+endloc_00402ca7:
 db 0x8d
 dd 0x000026b4
 dd 0x90660000
@@ -2327,7 +2327,7 @@ test ecx, ecx
 je short loc_00402cbd  ; je 0x402cbd
 jmp near loc_00402b38  ; jmp 0x402b38
 
-loc_00402cd7:
+endloc_00402cd7:
 db 0x8d
 dd 0x000026b4
 dd 0x90660000
@@ -2356,7 +2356,7 @@ mov esi, dword [esp + 0x2c]
 mov edx, dword [esp + 0x20]
 jmp near loc_00402ba7  ; jmp 0x402ba7
 
-loc_00402d3b:
+endloc_00402d3b:
 db 0x8d
 dd 0x90002674
 
@@ -2382,7 +2382,7 @@ jne loc_00402e9d  ; jne 0x402e9d
 loc_00402d74:
 mov edx, dword [esp + 0x30]
 mov dword [esp + 4], 0
-mov eax, dword fs:[0x18]
+mov eax, dword [fs:0x18]
 mov dword [esp + 8], edx
 mov eax, dword [eax + 0x30]
 mov eax, dword [eax + 0x18]
@@ -2425,7 +2425,7 @@ mov dword [esp + 0x2c], esi
 mov esi, eax
 jmp near loc_00402ce4  ; jmp 0x402ce4
 
-loc_00402e1b:
+endloc_00402e1b:
 db 0x8d
 dd 0x90002674
 
@@ -2449,7 +2449,7 @@ mov eax, dword [esp + 0x2c]
 mov dword [esp + 0x5c], eax
 jmp near loc_00402b9b  ; jmp 0x402b9b
 
-loc_00402e5f:
+endloc_00402e5f:
 db 0x90
 
 loc_00402e60:
@@ -2463,7 +2463,7 @@ add esi, eax
 lea ecx, [ebp + esi*2]
 jmp near loc_0040296e  ; jmp 0x40296e
 
-loc_00402e8b:
+endloc_00402e8b:
 db 0x8d
 dd 0x90002674
 
@@ -2500,7 +2500,7 @@ call fcn_00406890  ; call 0x406890
 sub esp, 0x10
 mov edi, dword [esp + 0x30]
 mov dword [esp + 4], 0
-mov eax, dword fs:[0x18]
+mov eax, dword [fs:0x18]
 mov dword [esp + 8], edi
 mov eax, dword [eax + 0x30]
 mov eax, dword [eax + 0x18]
@@ -2514,7 +2514,7 @@ test edx, edx
 jne loc_00402dae  ; jne 0x402dae
 jmp near loc_00402dd0  ; jmp 0x402dd0
 
-loc_00402f2f:
+endloc_00402f2f:
 db 0x90
 
 loc_00402f30:
@@ -2549,7 +2549,7 @@ sub esp, 4
 call fcn_00401930  ; call 0x401930
 jmp near loc_00402479  ; jmp 0x402479
 
-loc_00402fad:
+endloc_00402fad:
 db 0x8d
 db 0x76
 db 0x00
@@ -2587,7 +2587,7 @@ add esp, 0x68
 pop edi
 ret
 
-loc_00403035:
+endloc_00403035:
 db 0x8d
 db 0xb4
 db 0x26
@@ -2606,7 +2606,7 @@ sub esp, 0x10
 add esp, 0x1c
 ret
 
-loc_0040306f:
+endloc_0040306f:
 db 0x90
 
 fcn_00403070:
@@ -2621,7 +2621,7 @@ sub esp, 0x10
 add esp, 0x1c
 ret
 
-loc_0040309f:
+endloc_0040309f:
 db 0x90
 
 fcn_004030a0:
@@ -2636,7 +2636,7 @@ sub esp, 0x10
 add esp, 0x1c
 ret
 
-loc_004030cf:
+endloc_004030cf:
 db 0x90
 
 fcn_004030d0:
@@ -2651,7 +2651,7 @@ sub esp, 0x10
 add esp, 0x1c
 ret
 
-loc_004030ff:
+endloc_004030ff:
 db 0x90
 
 fcn_00403100:
@@ -2666,7 +2666,7 @@ sub esp, 0x10
 add esp, 0x1c
 ret
 
-loc_0040312f:
+endloc_0040312f:
 db 0x90
 
 fcn_00403130:
@@ -2681,7 +2681,7 @@ sub esp, 0x10
 add esp, 0x1c
 ret
 
-loc_0040315f:
+endloc_0040315f:
 db 0x90
 
 fcn_00403160:
@@ -2696,7 +2696,7 @@ sub esp, 0x10
 add esp, 0x1c
 ret
 
-loc_0040318f:
+endloc_0040318f:
 db 0x90
 
 fcn_00403190:
@@ -2750,7 +2750,7 @@ pop ebx
 pop esi
 ret
 
-loc_00403285:
+endloc_00403285:
 db 0x8d
 db 0xb4
 db 0x26
@@ -2799,7 +2799,7 @@ cmp eax, 0xffffffff
 je loc_004035f8  ; je 0x4035f8
 lea eax, [eax + 2]
 mov dword [esp + 4], 0
-mov edx, dword fs:[0x18]
+mov edx, dword [fs:0x18]
 mov dword [esp + 8], eax
 mov eax, dword [edx + 0x30]
 mov dword [esp + 0x28], ecx
@@ -2860,7 +2860,7 @@ mov edx, eax
 lea eax, [eax + eax + 2]
 mov dword [esp + 8], eax
 mov dword [esp + 4], 0
-mov edi, dword fs:[0x18]
+mov edi, dword [fs:0x18]
 mov eax, dword [edi + 0x30]
 mov dword [esp + 0x34], edx
 mov eax, dword [eax + 0x18]
@@ -2935,7 +2935,7 @@ sub esp, 8
 loc_004034f5:
 mov dword [esp + 8], ebx
 mov dword [esp + 4], 0
-mov eax, dword fs:[0x18]
+mov eax, dword [fs:0x18]
 mov eax, dword [eax + 0x30]
 mov eax, dword [eax + 0x18]
 mov dword [esp], eax
@@ -2981,7 +2981,7 @@ pop edi
 pop ebp
 ret
 
-loc_004035b6:
+endloc_004035b6:
 db 0x8d
 db 0xb4
 dd 0x00000026
@@ -3001,7 +3001,7 @@ sub esp, 0xc
 call fcn_00401930  ; call 0x401930
 jmp near loc_004032a8  ; jmp 0x4032a8
 
-loc_004035f5:
+endloc_004035f5:
 db 0x8d
 db 0x76
 db 0x00
@@ -3025,7 +3025,7 @@ mov dword [esp], 0
 call fcn_00401fd0  ; call 0x401fd0
 jmp near loc_004032a8  ; jmp 0x4032a8
 
-loc_00403635:
+endloc_00403635:
 db 0x8d
 db 0x76
 db 0x00
@@ -3047,7 +3047,7 @@ mov ebp, 1
 mov dword [esp + 0x28], eax
 jmp near loc_004034a5  ; jmp 0x4034a5
 
-loc_00403661:
+endloc_00403661:
 db 0x8d
 db 0xb4
 db 0x26
@@ -3080,7 +3080,7 @@ cmp eax, ecx
 jb short loc_00403690  ; jb 0x403690
 jmp short loc_0040364c  ; jmp 0x40364c
 
-loc_0040369e:
+endloc_0040369e:
 db 0x66
 db 0x90
 
@@ -3119,7 +3119,7 @@ call fcn_00406860  ; call 0x406860
 sub esp, 0x10
 jmp near loc_0040359d  ; jmp 0x40359d
 
-loc_0040374a:
+endloc_0040374a:
 db 0x8d
 db 0xb6
 dd 0x00000000
@@ -3150,7 +3150,7 @@ jne loc_00403688  ; jne 0x403688
 mov dword [esp + 0x28], 0
 jmp near loc_004033c7  ; jmp 0x4033c7
 
-loc_004037ae:
+endloc_004037ae:
 db 0x66
 db 0x90
 
@@ -3162,7 +3162,7 @@ call fcn_00406830  ; call 0x406830
 sub esp, 8
 jmp near loc_004034f5  ; jmp 0x4034f5
 
-loc_004037c7:
+endloc_004037c7:
 db 0x8d
 dd 0x000026b4
 dd 0x90660000
@@ -3171,7 +3171,7 @@ loc_004037d0:
 shr ecx, 1
 jmp near loc_0040364c  ; jmp 0x40364c
 
-loc_004037d7:
+endloc_004037d7:
 db 0x8d
 dd 0x000026b4
 dd 0x90660000
@@ -3215,7 +3215,7 @@ mov dword [esp + 0x28], 0xfde9
 mov ebp, 3
 jmp near loc_004033c7  ; jmp 0x4033c7
 
-loc_00403862:
+endloc_00403862:
 db 0x8d
 db 0xb4
 dd 0x00000026
@@ -3234,7 +3234,7 @@ rep stosd  ; rep stosd dword es:[edi], eax
 lea ecx, [esp + 0x68]
 jmp short loc_0040389f  ; jmp 0x40389f
 
-loc_00403891:
+endloc_00403891:
 db 0x8d
 db 0xb4
 db 0x26
@@ -3272,7 +3272,7 @@ add esp, 0x278
 pop edi
 ret
 
-loc_00403928:
+endloc_00403928:
 dd 0x0026b48d
 dd 0x90000000
 
@@ -3286,7 +3286,7 @@ add esp, 0x278
 pop edi
 ret
 
-loc_0040394d:
+endloc_0040394d:
 db 0x8d
 db 0x76
 db 0x00
@@ -3295,7 +3295,7 @@ fcn_00403950:
 push edi
 push esi
 push ebx
-mov edi, dword fs:[0x18]
+mov edi, dword [fs:0x18]
 sub esp, 0x40
 mov eax, dword [ref_0040a02c]  ; mov eax, dword [0x40a02c]
 mov dword [esp], eax
@@ -3411,7 +3411,7 @@ pop esi
 pop edi
 ret
 
-loc_00403b52:
+endloc_00403b52:
 db 0x8d
 db 0xb6
 dd 0x00000000
@@ -3423,7 +3423,7 @@ pop esi
 pop edi
 jmp near fcn_00401930  ; jmp 0x401930
 
-loc_00403b63:
+endloc_00403b63:
 db 0x8d
 dd 0x000026b4
 dd 0xb68d0000
@@ -3467,7 +3467,7 @@ pop edi
 pop ebp
 ret
 
-loc_00403bdc:
+endloc_00403bdc:
 dd 0x0026748d
 
 loc_00403be0:
@@ -3498,7 +3498,7 @@ pop edi
 pop ebp
 ret
 
-loc_00403c3d:
+endloc_00403c3d:
 db 0x8d
 db 0x76
 db 0x00
@@ -3516,7 +3516,7 @@ loc_00403c57:
 add esp, 0x1c
 ret
 
-loc_00403c5b:
+endloc_00403c5b:
 db 0x8d
 dd 0x90002674
 
@@ -3547,7 +3547,7 @@ mov dword [esp], ref_00408022  ; mov dword [esp], 0x408022
 call dword [__imp___assert]  ; ucall: call dword [0x40c3d0]
 jmp near loc_00403c57  ; jmp 0x403c57
 
-loc_00403d0d:
+endloc_00403d0d:
 db 0x8d
 db 0x76
 db 0x00
@@ -3562,13 +3562,13 @@ call fcn_00404410  ; call 0x404410
 add esp, 0x1c
 ret
 
-loc_00403d2c:
+endloc_00403d2c:
 dd 0x0026748d
 
 loc_00403d30:
 jmp near fcn_00403c40  ; jmp 0x403c40
 
-loc_00403d35:
+endloc_00403d35:
 db 0x8d
 db 0xb4
 db 0x26
@@ -3588,7 +3588,7 @@ loc_00403d57:
 add esp, 0x1c
 ret
 
-loc_00403d5b:
+endloc_00403d5b:
 db 0x8d
 dd 0x90002674
 
@@ -3617,7 +3617,7 @@ mov dword [esp], ref_00408022  ; mov dword [esp], 0x408022
 call dword [__imp___assert]  ; ucall: call dword [0x40c3d0]
 jmp near loc_00403d57  ; jmp 0x403d57
 
-loc_00403e02:
+endloc_00403e02:
 db 0x8d
 db 0xb4
 dd 0x00000026
@@ -3636,7 +3636,7 @@ sub esp, 0x10
 add esp, 0x1c
 ret
 
-loc_00403e3f:
+endloc_00403e3f:
 db 0x90
 
 fcn_00403e40:
@@ -3673,7 +3673,7 @@ pop ebx
 pop esi
 ret
 
-loc_00403ed3:
+endloc_00403ed3:
 db 0x8d
 dd 0x000026b4
 dd 0xb68d0000
@@ -3693,7 +3693,7 @@ sub esp, 0x14
 add esp, 0x2c
 ret
 
-loc_00403f18:
+endloc_00403f18:
 dd 0x90909090
 dd 0x90909090
 
@@ -3725,7 +3725,7 @@ test dx, dx
 jne short loc_00403f71  ; jne 0x403f71
 jmp near loc_004042c1  ; jmp 0x4042c1
 
-loc_00403f61:
+endloc_00403f61:
 db 0x8d
 db 0xb4
 db 0x26
@@ -3789,7 +3789,7 @@ loc_00403fd6:
 mov ecx, eax
 jmp short loc_00403f98  ; jmp 0x403f98
 
-loc_00403fda:
+endloc_00403fda:
 db 0x8d
 db 0xb6
 dd 0x00000000
@@ -3802,7 +3802,7 @@ mov edi, 1
 mov ecx, eax
 jmp short loc_00403f98  ; jmp 0x403f98
 
-loc_00403fef:
+endloc_00403fef:
 db 0x90
 
 loc_00403ff0:
@@ -3927,7 +3927,7 @@ je loc_004042f0  ; je 0x4042f0
 mov eax, ecx
 jmp short loc_004041d6  ; jmp 0x4041d6
 
-loc_004041c8:
+endloc_004041c8:
 dd 0x0026b48d
 dd 0x90000000
 
@@ -3974,7 +3974,7 @@ cmp eax, 1
 ja short loc_00404252  ; ja 0x404252
 jmp near loc_004042dd  ; jmp 0x4042dd
 
-loc_00404239:
+endloc_00404239:
 db 0x8d
 db 0xb4
 db 0x26
@@ -4013,7 +4013,7 @@ xor eax, eax
 mov ecx, 0x2e
 jmp short loc_0040428f  ; jmp 0x40428f
 
-loc_00404282:
+endloc_00404282:
 db 0x8d
 db 0xb6
 dd 0x00000000
@@ -4057,7 +4057,7 @@ test eax, eax
 je loc_0040425f  ; je 0x40425f
 jmp near loc_0040425a  ; jmp 0x40425a
 
-loc_004042ea:
+endloc_004042ea:
 db 0x8d
 db 0xb6
 dd 0x00000000
@@ -4066,7 +4066,7 @@ loc_004042f0:
 mov eax, ecx
 jmp near loc_004041e2  ; jmp 0x4041e2
 
-loc_004042f7:
+endloc_004042f7:
 db 0x8d
 dd 0x000026b4
 dd 0x90660000
@@ -4095,7 +4095,7 @@ mov dword [ref_0040a8b4], eax  ; mov dword [0x40a8b4], eax
 add esp, 0x1c
 ret
 
-loc_00404353:
+endloc_00404353:
 db 0x8d
 dd 0x000026b4
 dd 0xb68d0000
@@ -4118,7 +4118,7 @@ mov eax, ebx
 pop ebx
 ret
 
-loc_00404393:
+endloc_00404393:
 db 0x8d
 dd 0x90002674
 
@@ -4151,7 +4151,7 @@ add esp, 0x38
 pop ebx
 ret
 
-loc_004043f8:
+endloc_004043f8:
 dd 0x0026b48d
 dd 0x90000000
 
@@ -4191,7 +4191,7 @@ sub esp, 4
 lea edx, [ebp + ebp]
 mov dword [esp + 4], 0
 mov dword [esp + 8], edx
-mov eax, dword fs:[0x18]
+mov eax, dword [fs:0x18]
 mov eax, dword [eax + 0x30]
 mov eax, dword [eax + 0x18]
 mov dword [esp], eax
@@ -4236,7 +4236,7 @@ mov ebp, eax
 loc_00404502:
 mov dword [esp + 8], esi
 mov dword [esp + 4], 0
-mov eax, dword fs:[0x18]
+mov eax, dword [fs:0x18]
 mov eax, dword [eax + 0x30]
 mov eax, dword [eax + 0x18]
 mov dword [esp], eax
@@ -4264,7 +4264,7 @@ pop edi
 pop ebp
 ret
 
-loc_0040455e:
+endloc_0040455e:
 db 0x66
 db 0x90
 
@@ -4281,7 +4281,7 @@ sub esp, 0xc
 mov ebp, eax
 jmp near loc_00404502  ; jmp 0x404502
 
-loc_00404586:
+endloc_00404586:
 db 0x8d
 db 0xb4
 dd 0x00000026
@@ -4322,7 +4322,7 @@ cmp esi, ebp
 jbe short loc_004045f7  ; jbe 0x4045f7
 jmp short loc_00404627  ; jmp 0x404627
 
-loc_004045ed:
+endloc_004045ed:
 db 0x8d
 db 0x76
 db 0x00
@@ -4344,7 +4344,7 @@ test eax, eax
 jne short loc_004045f0  ; jne 0x4045f0
 jmp near loc_00404502  ; jmp 0x404502
 
-loc_0040461b:
+endloc_0040461b:
 db 0x8d
 dd 0x90002674
 
@@ -4355,7 +4355,7 @@ jmp near loc_0040443d  ; jmp 0x40443d
 loc_00404627:
 mov dword [esp + 8], esi
 mov dword [esp + 4], 0
-mov eax, dword fs:[0x18]
+mov eax, dword [fs:0x18]
 mov eax, dword [eax + 0x30]
 mov eax, dword [eax + 0x18]
 mov dword [esp], eax
@@ -4376,7 +4376,7 @@ loc_00404674:
 mov eax, dword [esp + 0x18]
 jmp near loc_004045d9  ; jmp 0x4045d9
 
-loc_0040467d:
+endloc_0040467d:
 db 0x8d
 db 0x76
 db 0x00
@@ -4407,7 +4407,7 @@ cmp eax, 0x11
 ja loc_00404898  ; ja 0x404898
 jmp dword [eax*4 + ref_00408180]  ; ujmp: jmp dword [eax*4 + 0x408180]
 
-loc_004046ce:
+endloc_004046ce:
 db 0x66
 db 0x90
 
@@ -4430,7 +4430,7 @@ pop ebp
 lea esp, [ecx - 4]
 ret 0x10
 
-loc_004046fa:
+endloc_004046fa:
 db 0x8d
 db 0xb6
 dd 0x00000000
@@ -4510,7 +4510,7 @@ xor edx, edx
 sub esp, 0xc
 jmp near loc_004046ea  ; jmp 0x4046ea
 
-loc_0040483b:
+endloc_0040483b:
 db 0x8d
 dd 0x90002674
 
@@ -4546,7 +4546,7 @@ pop ebp
 lea esp, [ecx - 4]
 ret 0x10
 
-loc_00404877:
+endloc_00404877:
 db 0x8d
 dd 0x000026b4
 dd 0x90660000
@@ -4558,7 +4558,7 @@ cmp esi, 0x40
 ja short loc_00404865  ; ja 0x404865
 jmp dword [esi*4 + ref_004081c8]  ; ujmp: jmp dword [esi*4 + 0x4081c8]
 
-loc_00404895:
+endloc_00404895:
 db 0x8d
 db 0x76
 db 0x00
@@ -4573,7 +4573,7 @@ sub esp, 0x10
 mov edx, eax
 jmp near loc_004046ea  ; jmp 0x4046ea
 
-loc_004048b6:
+endloc_004048b6:
 db 0x8d
 db 0xb4
 dd 0x00000026
@@ -4620,7 +4620,7 @@ mov dword [esp + 0xc], 0
 mov dword [esp + 8], 0
 mov dword [esp + 4], 0xb1
 mov dword [esp], eax
-mov esi, dword fs:[0x18]
+mov esi, dword [fs:0x18]
 call fcn_00406860  ; call 0x406860
 sub esp, 0x10
 
@@ -4675,7 +4675,7 @@ mov ecx, eax
 loc_00404a23:
 mov dword [esp + 8], edi
 mov dword [esp + 4], 0
-mov eax, dword fs:[0x18]
+mov eax, dword [fs:0x18]
 mov eax, dword [eax + 0x30]
 mov dword [ebp - 0x23c], ecx
 mov eax, dword [eax + 0x18]
@@ -4706,7 +4706,7 @@ call fcn_00406860  ; call 0x406860
 sub esp, 0x10
 jmp near loc_00404962  ; jmp 0x404962
 
-loc_00404ab3:
+endloc_00404ab3:
 db 0x8d
 dd 0x90002674
 
@@ -4755,7 +4755,7 @@ sub esp, 4
 lea ecx, [esi + esi]
 mov dword [esp + 4], 0
 mov dword [esp + 8], ecx
-mov eax, dword fs:[0x18]
+mov eax, dword [fs:0x18]
 mov eax, dword [eax + 0x30]
 mov eax, dword [eax + 0x18]
 mov dword [esp], eax
@@ -4795,7 +4795,7 @@ je loc_004057fa  ; je 0x4057fa
 loc_00404bef:
 mov dword [esp + 8], edi
 mov dword [esp + 4], 0
-mov eax, dword fs:[0x18]
+mov eax, dword [fs:0x18]
 mov eax, dword [eax + 0x30]
 mov eax, dword [eax + 0x18]
 mov dword [esp], eax
@@ -4806,7 +4806,7 @@ call fcn_00404410  ; call 0x404410
 mov eax, dword [ebx + 0xc]
 jmp near loc_00404861  ; jmp 0x404861
 
-loc_00404c23:
+endloc_00404c23:
 db 0x8d
 dd 0x90002674
 
@@ -4836,7 +4836,7 @@ call fcn_00404410  ; call 0x404410
 mov eax, dword [ebx + 0xc]
 jmp near loc_00404859  ; jmp 0x404859
 
-loc_00404c87:
+endloc_00404c87:
 db 0x8d
 dd 0x000026b4
 dd 0x90660000
@@ -4865,7 +4865,7 @@ xor edx, edx
 sub esp, 4
 jmp near loc_004046ea  ; jmp 0x4046ea
 
-loc_00404d01:
+endloc_00404d01:
 db 0x8d
 db 0xb4
 db 0x26
@@ -4888,7 +4888,7 @@ xor edx, edx
 sub esp, 0x1c
 jmp near loc_004046ea  ; jmp 0x4046ea
 
-loc_00404d4f:
+endloc_00404d4f:
 db 0x90
 
 loc_00404d50:
@@ -4899,7 +4899,7 @@ xor edx, edx
 sub esp, 4
 jmp near loc_004046ea  ; jmp 0x4046ea
 
-loc_00404d67:
+endloc_00404d67:
 db 0x8d
 dd 0x000026b4
 dd 0x90660000
@@ -4914,7 +4914,7 @@ xor edx, edx
 sub esp, 4
 jmp near loc_004046ea  ; jmp 0x4046ea
 
-loc_00404d8f:
+endloc_00404d8f:
 db 0x90
 
 loc_00404d90:
@@ -4924,7 +4924,7 @@ test eax, eax
 setne dl
 jmp near loc_004046ea  ; jmp 0x4046ea
 
-loc_00404da1:
+endloc_00404da1:
 db 0x8d
 db 0xb4
 db 0x26
@@ -4979,7 +4979,7 @@ xor edx, edx
 sub esp, 0x10
 jmp near loc_004046ea  ; jmp 0x4046ea
 
-loc_00404ea1:
+endloc_00404ea1:
 db 0x8d
 db 0xb4
 db 0x26
@@ -5002,7 +5002,7 @@ call fcn_00403290  ; call 0x403290
 xor edx, edx
 jmp near loc_004046ea  ; jmp 0x4046ea
 
-loc_00404eef:
+endloc_00404eef:
 db 0x90
 
 loc_00404ef0:
@@ -5016,7 +5016,7 @@ sub esp, 8
 mov ecx, eax
 jmp near loc_00404a23  ; jmp 0x404a23
 
-loc_00404f12:
+endloc_00404f12:
 db 0x8d
 db 0xb6
 dd 0x00000000
@@ -5353,7 +5353,7 @@ call fcn_00406a08  ; call 0x406a08
 sub esp, 4
 jmp near loc_00404ceb  ; jmp 0x404ceb
 
-loc_00405629:
+endloc_00405629:
 db 0x8d
 db 0xb4
 db 0x26
@@ -5545,7 +5545,7 @@ loc_00405834:
 xor eax, eax
 jmp near loc_0040557e  ; jmp 0x40557e
 
-loc_0040583b:
+endloc_0040583b:
 db 0x8d
 dd 0x90002674
 
@@ -5625,7 +5625,7 @@ xor eax, eax
 mov dword [ref_0040a04c], 0x1000000  ; mov dword [0x40a04c], 0x1000000
 jmp short loc_004059c7  ; jmp 0x4059c7
 
-loc_004059bf:
+endloc_004059bf:
 db 0x90
 
 loc_004059c0:
@@ -5718,7 +5718,7 @@ pop ebp
 lea esp, [ecx - 4]
 ret 0x10
 
-loc_00405b51:
+endloc_00405b51:
 db 0x8d
 db 0xb4
 db 0x26
@@ -5731,7 +5731,7 @@ mov dword [ebp - 0x280], eax
 sub esp, 4
 jmp near loc_004058d0  ; jmp 0x4058d0
 
-loc_00405b72:
+endloc_00405b72:
 db 0x8d
 db 0xb6
 dd 0x00000000
@@ -5807,7 +5807,7 @@ xor edx, edx
 mov ecx, 0x2a
 jmp short loc_00405cbf  ; jmp 0x405cbf
 
-loc_00405cb4:
+endloc_00405cb4:
 dd 0x0026748d
 
 loc_00405cb8:
@@ -5857,7 +5857,7 @@ xor edx, edx
 mov ecx, 0x2a
 jmp short loc_00405d47  ; jmp 0x405d47
 
-loc_00405d39:
+endloc_00405d39:
 db 0x8d
 db 0xb4
 db 0x26
@@ -5929,7 +5929,7 @@ sub esp, 8
 mov esi, eax
 jmp short loc_00405e50  ; jmp 0x405e50
 
-loc_00405e34:
+endloc_00405e34:
 dd 0x0026748d
 
 loc_00405e38:
@@ -5960,7 +5960,7 @@ pop ebp
 lea esp, [ecx - 4]
 ret 0x10
 
-loc_00405e8b:
+endloc_00405e8b:
 db 0x8d
 dd 0x90002674
 
@@ -5981,7 +5981,7 @@ call fcn_00406948  ; call 0x406948
 sub esp, 4
 jmp short loc_00405e50  ; jmp 0x405e50
 
-loc_00405ec4:
+endloc_00405ec4:
 dd 0x0026748d
 
 loc_00405ec8:
@@ -6478,7 +6478,7 @@ call fcn_00406a08  ; call 0x406a08
 sub esp, 4
 jmp near loc_00405a55  ; jmp 0x405a55
 
-loc_004066ce:
+endloc_004066ce:
 db 0x66
 db 0x90
 
@@ -6982,7 +6982,7 @@ call fcn_00406ab8  ; call 0x406ab8
 mov edi, dword [eax]
 call fcn_00406aa8  ; call 0x406aa8
 mov ebx, eax
-mov eax, dword fs:[0x18]
+mov eax, dword [fs:0x18]
 mov eax, dword [eax + 0x30]
 mov eax, dword [eax + 8]
 mov edx, dword [eax + 0x3c]
@@ -7041,7 +7041,7 @@ nop
 fcn_00406ad0:
 ret
 
-loc_00406ad1:
+endloc_00406ad1:
 db 0x90
 db 0x90
 db 0x90
@@ -7137,7 +7137,7 @@ pop ebp
 lea esp, [ecx - 4]
 ret
 
-loc_00406bc5:
+endloc_00406bc5:
 db 0x8d
 db 0x76
 db 0x00
@@ -7146,7 +7146,7 @@ loc_00406bc8:
 add dword [ebp - 0x6c], 1
 jmp near loc_00406b37  ; jmp 0x406b37
 
-loc_00406bd1:
+endloc_00406bd1:
 db 0x8d
 db 0xb4
 db 0x26
@@ -8598,7 +8598,7 @@ dd 0x00000000
 dd 0x00000000
 dd 0x00000000
 
-ref_00408180:
+ref_00408180:  ; may contain a jump table
 dd loc_00404898
 dd loc_00404da8
 dd loc_00404c90
@@ -8618,7 +8618,7 @@ dd loc_00404898
 dd loc_00404d70
 dd loc_00404d90
 
-ref_004081c8:
+ref_004081c8:  ; may contain a jump table
 dd loc_004056d4
 dd loc_004056c8
 dd loc_004056bc
@@ -15894,7 +15894,7 @@ dd 0x24425454
 dd 0x42424201
 dd 0x40444242
 dd 0x42424200
-dd ref_00404242
+dd 0x00404242
 dd 0x04040400
 dd 0x00000404
 dd 0x00000000
@@ -31801,9 +31801,9 @@ db 0x10
 
 ref_0041e525:
 db 0x01
-db 0x26
+dd ref_00410026
+db 0x6e
 db 0x00
-dd 0x006e0041
 dd 0x0075006e
 dd 0x0065006c
 dd 0x00090072
@@ -66627,7 +66627,7 @@ dd 0x04e70100
 dd ref_0043001e
 dd 0x40030500
 dd 0x38004080
-dd ref_004012c5
+dd 0x004012c5
 db 0x7e
 db 0x7c
 db 0x00
@@ -66670,7 +66670,7 @@ ref_00440117:
 db 0x0a
 dd 0x023b0143
 dd 0x3a000874
-dd ref_004010c1
+dd 0x004010c1
 dd 0x00007cc6
 dd 0x00004142
 dd 0x00740239
@@ -66717,7 +66717,7 @@ dd 0x023b0141
 dd 0x02390874
 dd 0x0a030c74
 dd 0x3a000104
-dd ref_004011b3
+dd 0x004011b3
 dd 0x00007cea
 dd 0x00004204
 dd 0x00740239
@@ -66758,7 +66758,7 @@ dd 0x02390147
 dd 0x30010874
 dd 0x0c740239
 dd 0x3a003001
-dd ref_00401257
+dd 0x00401257
 dd 0x00007d12
 dd 0x000042a8
 dd 0x00740239
@@ -66775,7 +66775,7 @@ dd 0x74023900
 dd 0x00760200
 dd 0x04740239
 dd 0x38003101
-dd ref_00401290
+dd 0x00401290
 dd 0x00007d36
 dd 0x00740239
 dd 0x39007602
@@ -66910,7 +66910,7 @@ dd 0x7e180040
 dd 0x44df0000
 dd 0x023b0000
 dd 0x38000074
-dd ref_00403dfd
+dd 0x00403dfd
 dd 0x00007e39
 dd 0x00740239
 dd 0x80220305
@@ -66929,7 +66929,7 @@ dd 0x403d1006
 dd 0x00002500
 dd 0x479c0100
 dd 0x3a000045
-dd ref_00403d28
+dd 0x00403d28
 dd 0x00007e4d
 dd 0x0000453d
 dd 0x0074023b
@@ -66968,7 +66968,7 @@ dd 0x300f0465
 dd 0x6100000d
 dd 0x5f000002
 dd 0x3a000002
-dd ref_00403bf0
+dd 0x00403bf0
 dd 0x00007e59
 dd 0x000045dc
 dd 0x00740239
@@ -66980,7 +66980,7 @@ dd 0x74023900
 dd 0x30080204
 dd 0x0c740239
 dd 0x38003101
-dd ref_00403c2f
+dd 0x00403c2f
 dd 0x00007eaa
 dd 0x00740239
 dd 0x00007502
@@ -67042,7 +67042,7 @@ dd 0x01000007
 dd 0xff0d043f
 dd 0x44000046
 dd 0x00007a2b
-dd ref_0040396d
+dd 0x0040396d
 dd 0x07d80003
 dd 0x88020000
 dd 0xd845180b
@@ -67052,7 +67052,7 @@ dd 0x0000034d
 dd 0x0000034b
 dd 0x43000000
 dd 0x000078ee
-dd ref_00403af1
+dd 0x00403af1
 dd 0x07f00001
 dd 0x51010000
 dd 0x473c0504
@@ -67091,7 +67091,7 @@ dd 0x0239b808
 dd 0x30010874
 dd 0x0c740239
 dd 0x3f003001
-dd ref_004039ea
+dd 0x004039ea
 dd 0x00007f5d
 dd 0x403a023a
 dd 0x007f8000
@@ -67114,7 +67114,7 @@ dd 0x02393001
 dd 0x30012474
 dd 0x2c740239
 dd 0x3a003001
-dd ref_00403aa6
+dd 0x00403aa6
 dd 0x00007e88
 dd 0x00004816
 dd 0x04740239
@@ -67126,7 +67126,7 @@ dd 0x2b00007f
 dd 0x39000048
 dd 0x02047402
 dd 0x3a000073
-dd ref_00403ade
+dd 0x00403ade
 dd 0x00007e88
 dd 0x0000484d
 dd 0x04740239
@@ -67142,7 +67142,7 @@ dd 0x6b000080
 dd 0x39000048
 dd 0x02047402
 dd 0x3f000073
-dd ref_00403b31
+dd 0x00403b31
 dd 0x00008023
 dd 0x403b483a
 dd 0x00803a00
@@ -67198,7 +67198,7 @@ dd 0x03107402
 dd 0x397bf291
 dd 0x02147402
 dd 0x3a00ff08
-dd ref_004031fd
+dd 0x004031fd
 dd 0x00007e88
 dd 0x0000496e
 dd 0x04740239
@@ -67216,7 +67216,7 @@ dd 0x31010874
 dd 0x0c740239
 dd 0x80bc0305
 dd 0x3a000040
-dd ref_00403255
+dd 0x00403255
 dd 0x000080a5
 dd 0x000049cc
 dd 0x00740239
@@ -67320,7 +67320,7 @@ dd 0x4030a006
 dd 0x00002f00
 dd 0x529c0100
 dd 0x3800004b
-dd ref_004030c8
+dd 0x004030c8
 dd 0x00007e88
 dd 0x04740239
 dd 0x03000a03
@@ -67378,7 +67378,7 @@ dd 0x01007265
 dd 0x9d0f03ef
 dd 0x0300001c
 dd 0x387fae91
-dd ref_0040301b
+dd 0x0040301b
 dd 0x000080ed
 dd 0x00740239
 dd 0x7fae9103
@@ -67609,7 +67609,7 @@ dd 0x39004080
 dd 0x040c7402
 dd 0x0675c491
 dd 0x38000000
-dd ref_00402918
+dd 0x00402918
 dd 0x00007f1b
 dd 0x04740239
 dd 0x00003001
@@ -67744,7 +67744,7 @@ dd 0xf8910300
 dd 0x74023977
 dd 0x00760408
 dd 0x3a002431
-dd ref_00402d27
+dd 0x00402d27
 dd 0x000081c1
 dd 0x00005204
 dd 0x00740239
@@ -67833,7 +67833,7 @@ dd 0x5000402e
 dd 0xa3000000
 dd 0x43000053
 dd 0x000078ee
-dd ref_00402ef5
+dd 0x00402ef5
 dd 0x05f00001
 dd 0x1e010000
 dd 0x53620d03
@@ -67858,13 +67858,13 @@ dd 0xc8030508
 dd 0x39004080
 dd 0x020c7402
 dd 0x38003008
-dd ref_00402f1a
+dd 0x00402f1a
 dd 0x00008009
 dd 0x04740239
 dd 0x02393001
 dd 0x77020874
 dd 0x3a000000
-dd ref_004029c9
+dd 0x004029c9
 dd 0x000081e1
 dd 0x000053ba
 dd 0x00740239
@@ -67890,7 +67890,7 @@ dd 0x39000082
 dd 0x04007402
 dd 0x0675b891
 dd 0x3a000000
-dd ref_00402472
+dd 0x00402472
 dd 0x000080ed
 dd 0x00005421
 dd 0x00740239
@@ -67910,7 +67910,7 @@ dd 0x01047402
 dd 0x74023930
 dd 0x00730408
 dd 0x3a002431
-dd ref_004025d1
+dd 0x004025d1
 dd 0x00007f37
 dd 0x00005479
 dd 0x04740239
@@ -67923,7 +67923,7 @@ dd 0x548f0000
 dd 0x02390000
 dd 0x91030474
 dd 0x3f007688
-dd ref_00402603
+dd 0x00402603
 dd 0x00008272
 dd 0x40262b3a
 dd 0x00800900
@@ -67932,7 +67932,7 @@ dd 0x74023900
 dd 0x39300104
 dd 0x02087402
 dd 0x3a000077
-dd ref_00402650
+dd 0x00402650
 dd 0x0000828b
 dd 0x000054c8
 dd 0x04740239
@@ -67948,7 +67948,7 @@ dd 0xf3000082
 dd 0x39000054
 dd 0x02047402
 dd 0x3a007108
-dd ref_004026ab
+dd 0x004026ab
 dd 0x0000828b
 dd 0x00005508
 dd 0x04740239
@@ -67964,7 +67964,7 @@ dd 0x55330000
 dd 0x02390000
 dd 0x0a030874
 dd 0x3a0009ec
-dd ref_00402700
+dd 0x00402700
 dd 0x0000828b
 dd 0x00005548
 dd 0x04740239
@@ -67980,7 +67980,7 @@ dd 0x73000082
 dd 0x39000055
 dd 0x02047402
 dd 0x3a007008
-dd ref_00402755
+dd 0x00402755
 dd 0x0000828b
 dd 0x00005588
 dd 0x04740239
@@ -67996,7 +67996,7 @@ dd 0x55b30000
 dd 0x02390000
 dd 0x0a030874
 dd 0x3f0009ec
-dd ref_004027ab
+dd 0x004027ab
 dd 0x000082c4
 dd 0x4027c43a
 dd 0x00828b00
@@ -68020,7 +68020,7 @@ dd 0x00561300
 dd 0x74023900
 dd 0xd8910404
 dd 0x3f000675
-dd ref_00402ddf
+dd 0x00402ddf
 dd 0x000082f9
 dd 0x402df93a
 dd 0x0082d800
@@ -68028,7 +68028,7 @@ dd 0x00563300
 dd 0x74023900
 dd 0xdc910404
 dd 0x3a000675
-dd ref_00402e08
+dd 0x00402e08
 dd 0x00007eaa
 dd 0x0000564a
 dd 0x00740239
@@ -68036,7 +68036,7 @@ dd 0x75d89104
 dd 0xa03f0006
 dd 0x7200402f
 dd 0x3f000082
-dd ref_00402fa8
+dd 0x00402fa8
 dd 0x000076fa
 dd 0x032e0c00
 dd 0x566e0000
@@ -68253,7 +68253,7 @@ dd 0xb7000069
 dd 0x39000059
 dd 0x91035001
 dd 0x3a007be8
-dd ref_00402255
+dd 0x00402255
 dd 0x0000830e
 dd 0x000059cd
 dd 0x00740239
@@ -68325,7 +68325,7 @@ dd 0x00798c46
 dd 0x0010f900
 dd 0x0010ef00
 dd 0x3a000000
-dd ref_00403919
+dd 0x00403919
 dd 0x0000831a
 dd 0x00005aed
 dd 0x00740239
@@ -68443,7 +68443,7 @@ dd 0x01047402
 dd 0x74023930
 dd 0xc8750308
 dd 0x3a00007b
-dd ref_00401648
+dd 0x00401648
 dd 0x00007d97
 dd 0x00005cd3
 dd 0x04740239
@@ -68452,7 +68452,7 @@ dd 0x08740239
 dd 0x39007302
 dd 0x020c7402
 dd 0x3a00ff08
-dd ref_004017d1
+dd 0x004017d1
 dd 0x00007d97
 dd 0x00005cf7
 dd 0x04740239
@@ -68461,7 +68461,7 @@ dd 0x08740239
 dd 0x39007302
 dd 0x020c7402
 dd 0x3800ff08
-dd ref_00401859
+dd 0x00401859
 dd 0x00007d97
 dd 0x04740239
 dd 0x01800a03
@@ -68478,7 +68478,7 @@ dd 0x74023901
 dd 0x39300108
 dd 0x020c7402
 dd 0x3a000073
-dd ref_004017f5
+dd 0x004017f5
 dd 0x00007e88
 dd 0x00005d5e
 dd 0x04740239
@@ -68530,7 +68530,7 @@ dd 0x1b1b024c
 dd 0x03000010
 dd 0x437bc875
 dd 0x00006037
-dd ref_0040169b
+dd 0x0040169b
 dd 0x01380001
 dd 0x4f010000
 dd 0x5f811b02
@@ -68589,7 +68589,7 @@ dd 0x0c740239
 dd 0x77c07503
 dd 0x10740239
 dd 0x3a003001
-dd ref_00401749
+dd 0x00401749
 dd 0x000083c0
 dd 0x00005f0c
 dd 0x00740239
@@ -68638,7 +68638,7 @@ dd 0x03087402
 dd 0x3901040a
 dd 0x020c7402
 dd 0x38000076
-dd ref_0040181e
+dd 0x0040181e
 dd 0x00007e88
 dd 0x04740239
 dd 0x014e0a03
@@ -68715,13 +68715,13 @@ dd 0x81340305
 dd 0x783f0040
 dd 0xbe004023
 dd 0x3a000068
-dd ref_00402395
+dd 0x00402395
 dd 0x00007fcb
 dd 0x00006107
 dd 0x04740239
 dd 0x81340305
 dd 0x3a000040
-dd ref_004023bd
+dd 0x004023bd
 dd 0x00007e88
 dd 0x00006128
 dd 0x04740239
@@ -68846,14 +68846,14 @@ dd 0x00630f11
 dd 0x7a2b4700
 dd 0x381d0000
 dd 0x00030040
-dd ref_0040381d
+dd 0x0040381d
 dd 0x00000000
 dd 0x180b8802
 dd 0x007a4646
 dd 0x001a7e00
 dd 0x001a7c00
 dd 0x3a000000
-dd ref_004033fd
+dd 0x004033fd
 dd 0x00008439
 dd 0x00006347
 dd 0x00740239
@@ -68867,7 +68867,7 @@ dd 0x02390648
 dd 0x30011074
 dd 0x14740239
 dd 0x3a003001
-dd ref_0040342c
+dd 0x0040342c
 dd 0x00007f1b
 dd 0x00006367
 dd 0x04740239
@@ -68897,7 +68897,7 @@ dd 0x74023900
 dd 0x39300104
 dd 0x02087402
 dd 0x3f000073
-dd ref_0040381d
+dd 0x0040381d
 dd 0x000076fa
 dd 0x40383838
 dd 0x00800900
@@ -68934,7 +68934,7 @@ dd 0x40813c03
 dd 0x1d3f0000
 dd 0x9b004037
 dd 0x38000048
-dd ref_00403742
+dd 0x00403742
 dd 0x00007e88
 dd 0x04740239
 dd 0x39c20802
@@ -68975,7 +68975,7 @@ dd 0x00001aa8
 dd 0x00001aa6
 dd 0x43000000
 dd 0x000078ee
-dd ref_004035c9
+dd 0x004035c9
 dd 0x07280001
 dd 0x92010000
 dd 0x65300201
@@ -69044,7 +69044,7 @@ dd 0x88000068
 dd 0x49000007
 dd 0x00006898
 dd 0x38549102
-dd ref_00403785
+dd 0x00403785
 dd 0x00008382
 dd 0x00740239
 dd 0x39007302
@@ -69053,7 +69053,7 @@ dd 0x067fb891
 dd 0x08740239
 dd 0x00549102
 dd 0x3f000000
-dd ref_004032a4
+dd 0x004032a4
 dd 0x000068be
 dd 0x4032e93a
 dd 0x0083df00
@@ -69085,7 +69085,7 @@ dd 0x39300104
 dd 0x06087402
 dd 0x067fb891
 dd 0x3a000223
-dd ref_0040337a
+dd 0x0040337a
 dd 0x000083a6
 dd 0x000066e1
 dd 0x00740239
@@ -69108,7 +69108,7 @@ dd 0x0b00007f
 dd 0x39000067
 dd 0x02047402
 dd 0x3a000073
-dd ref_00403516
+dd 0x00403516
 dd 0x00008009
 dd 0x00006726
 dd 0x04740239
@@ -69123,7 +69123,7 @@ dd 0x0239b908
 dd 0x30010874
 dd 0x0c740239
 dd 0x3a003001
-dd ref_00403566
+dd 0x00403566
 dd 0x00007e88
 dd 0x00006768
 dd 0x04740239
@@ -69176,7 +69176,7 @@ dd 0x00770200
 dd 0x04740239
 dd 0x81440305
 dd 0x38000040
-dd ref_004037bf
+dd 0x004037bf
 dd 0x00007fcb
 dd 0x04740239
 dd 0x00027302
@@ -69247,7 +69247,7 @@ dd 0x0239b808
 dd 0x30010874
 dd 0x0c740239
 dd 0x3a003001
-dd ref_00402315
+dd 0x00402315
 dd 0x00007b56
 dd 0x0000694a
 dd 0x0073e660
@@ -69345,7 +69345,7 @@ dd 0x1b00001f
 dd 0x4900001f
 dd 0x000070e1
 dd 0x385c9102
-dd ref_00401adf
+dd 0x00401adf
 dd 0x00008482
 dd 0x00740239
 dd 0x02393001
@@ -69384,7 +69384,7 @@ dd 0x01000002
 dd 0x7d090116
 dd 0x4700006b
 dd 0x00007a2b
-dd ref_00401ba5
+dd 0x00401ba5
 dd 0x1ba50003
 dd 0x00000040
 dd 0x88020000
@@ -69442,14 +69442,14 @@ dd 0x00001fb2
 dd 0x00001fb0
 dd 0x5d000000
 dd 0x000078ee
-dd ref_00401d68
+dd 0x00401d68
 dd 0x03200001
 dd 0xfa010000
 dd 0x006c7b12
 dd 0x7a2b4700
 dd 0x1d680000
 dd 0x00030040
-dd ref_00401d68
+dd 0x00401d68
 dd 0x00000000
 dd 0x180b8802
 dd 0x007a4646
@@ -69457,7 +69457,7 @@ dd 0x001fc700
 dd 0x001fc500
 dd 0x43000000
 dd 0x000078ee
-dd ref_00401dca
+dd 0x00401dca
 dd 0x03380001
 dd 0x02010000
 dd 0x6cb80901
@@ -69478,7 +69478,7 @@ dd 0x01000003
 dd 0xf50d0109
 dd 0x4700006c
 dd 0x00007a2b
-dd ref_00401e0e
+dd 0x00401e0e
 dd 0x1e0e0003
 dd 0x00000040
 dd 0x88020000
@@ -69511,12 +69511,12 @@ dd 0x006d6b09
 dd 0x7a2b4700
 dd 0x1e8d0000
 dd 0x00030040
-dd ref_00401e8d
+dd 0x00401e8d
 dd 0x00000005
 dd 0x180b8802
 dd 0x007a464b
 dd 0x3f000000
-dd ref_00401a11
+dd 0x00401a11
 dd 0x00007eea
 dd 0x401a3b3a
 dd 0x007f1b00
@@ -69526,7 +69526,7 @@ dd 0x39300104
 dd 0x06087402
 dd 0x24317f75
 dd 0x3a000423
-dd ref_00401a6d
+dd 0x00401a6d
 dd 0x00007f37
 dd 0x00006db0
 dd 0x04740239
@@ -69618,7 +69618,7 @@ dd 0xef000084
 dd 0x3900006e
 dd 0x02007402
 dd 0x3a000075
-dd ref_00401c7d
+dd 0x00401c7d
 dd 0x000083c0
 dd 0x00006f04
 dd 0x00740239
@@ -69630,7 +69630,7 @@ dd 0x74023900
 dd 0x39300104
 dd 0x02087402
 dd 0x3a000073
-dd ref_00401cc5
+dd 0x00401cc5
 dd 0x00007e88
 dd 0x00006f40
 dd 0x04740239
@@ -69693,7 +69693,7 @@ dd 0x02390076
 dd 0x30011874
 dd 0x1c740239
 dd 0x3a003001
-dd ref_00401de7
+dd 0x00401de7
 dd 0x00008009
 dd 0x00007036
 dd 0x04740239
@@ -69705,7 +69705,7 @@ dd 0x4b000071
 dd 0x39000070
 dd 0x91035001
 dd 0x3a000640
-dd ref_00401e29
+dd 0x00401e29
 dd 0x00008009
 dd 0x00007066
 dd 0x04740239
@@ -69714,7 +69714,7 @@ dd 0x73020874
 dd 0x453f0000
 dd 0xfa00401e
 dd 0x3a000076
-dd ref_00401e60
+dd 0x00401e60
 dd 0x00008009
 dd 0x0000708a
 dd 0x04740239
@@ -69723,7 +69723,7 @@ dd 0x73020874
 dd 0x753f0000
 dd 0xfa00401e
 dd 0x3f000076
-dd ref_00401e8d
+dd 0x00401e8d
 dd 0x000076fa
 dd 0x73696600
 dd 0x6e6f635f
@@ -69769,7 +69769,7 @@ dd 0xba0bba01
 dd 0x1d000003
 dd 0x19000020
 dd 0x3a000020
-dd ref_0040214f
+dd 0x0040214f
 dd 0x000084ef
 dd 0x00007169
 dd 0x00740239
@@ -69848,7 +69848,7 @@ dd 0x73490000
 dd 0x03000078
 dd 0x6c7bc091
 dd 0x000079c8
-dd ref_00401444
+dd 0x00401444
 dd 0x14440001
 dd 0x00370040
 dd 0x46010000
@@ -69903,7 +69903,7 @@ dd 0x03087402
 dd 0x3973c491
 dd 0x020c7402
 dd 0x3a00ff08
-dd ref_004014c9
+dd 0x004014c9
 dd 0x0000852f
 dd 0x000073a1
 dd 0x00740239
@@ -70026,7 +70026,7 @@ dd 0x03087402
 dd 0x397be291
 dd 0x020c7402
 dd 0x3a00ff08
-dd ref_00402086
+dd 0x00402086
 dd 0x00007c7e
 dd 0x00007579
 dd 0x00740239
@@ -70169,7 +70169,7 @@ dd 0x03087402
 dd 0x397bf291
 dd 0x020c7402
 dd 0x3a00ff08
-dd ref_004019b1
+dd 0x004019b1
 dd 0x0000852f
 dd 0x000077c8
 dd 0x00740239
@@ -70392,7 +70392,7 @@ dd 0x0079bc46
 dd 0x00254600
 dd 0x00254000
 dd 0x3a000000
-dd ref_00401325
+dd 0x00401325
 dd 0x0000813e
 dd 0x00007b2a
 dd 0x00740239
@@ -70422,7 +70422,7 @@ dd 0xe6487bf2
 dd 0x71000073
 dd 0x6f000025
 dd 0x3a000025
-dd ref_004020ec
+dd 0x004020ec
 dd 0x00007d97
 dd 0x00007ba4
 dd 0x04740239
@@ -70469,7 +70469,7 @@ dd 0xad00403c
 dd 0x01000000
 dd 0x7406046f
 dd 0x3a00007c
-dd ref_00403cdb
+dd 0x00403cdb
 dd 0x00008570
 dd 0x00007c4d
 dd 0x0074023b
@@ -72572,7 +72572,7 @@ dd 0xb400000f
 dd 0x2500001f
 dd 0x00004027
 dd 0x7be07503
-dd ref_00403b25
+dd 0x00403b25
 dd 0x98750300
 dd 0x4047257b
 dd 0x75030000
@@ -72583,14 +72583,14 @@ dd 0x00004066
 dd loc_00405ec8
 dd 0x00000060
 dd 0x0000174f
-dd ref_00406b25
+dd 0x00406b25
 dd 0x9c750300
 dd 0x4077257b
 dd 0x75030000
 dd 0x83257bb8
 dd 0x03000040
 dd 0x2c7be075
-dd ref_00405f08
+dd 0x00405f08
 dd 0x0000492b
 dd 0x0474022d
 dd 0x85f40305
@@ -72613,7 +72613,7 @@ dd 0x75030000
 dd 0xad257bb8
 dd 0x03000040
 dd 0x2c7be075
-dd ref_00405f5c
+dd 0x00405f5c
 dd 0x0000492b
 dd 0x0474022d
 dd 0x858c0305
@@ -72636,7 +72636,7 @@ dd 0x75030000
 dd 0xd7257bb8
 dd 0x03000040
 dd 0x2c7be075
-dd ref_00405fb4
+dd 0x00405fb4
 dd 0x0000492b
 dd 0x0474022d
 dd 0x85740305
@@ -72659,7 +72659,7 @@ dd 0x75030000
 dd 0x01257bb8
 dd 0x03000041
 dd 0x2c7be075
-dd ref_00406004
+dd 0x00406004
 dd 0x0000492b
 dd 0x0474022d
 dd 0x85c00305
@@ -72682,7 +72682,7 @@ dd 0x75030000
 dd 0x2b257bb8
 dd 0x03000041
 dd 0x2c7be075
-dd ref_00406054
+dd 0x00406054
 dd 0x0000492b
 dd 0x0474022d
 dd 0x85a40305
@@ -72705,7 +72705,7 @@ dd 0x75030000
 dd 0x55257bb8
 dd 0x03000041
 dd 0x2c7be075
-dd ref_004060a4
+dd 0x004060a4
 dd 0x0000492b
 dd 0x0474022d
 dd 0x85600305
@@ -72728,7 +72728,7 @@ dd 0x75030000
 dd 0x7f257bb8
 dd 0x03000041
 dd 0x2c7be075
-dd ref_004060f4
+dd 0x004060f4
 dd 0x0000492b
 dd 0x0474022d
 dd 0x85400305
@@ -72751,7 +72751,7 @@ dd 0x75030000
 dd 0xa9257bb8
 dd 0x03000041
 dd 0x2c7be075
-dd ref_00406144
+dd 0x00406144
 dd 0x0000492b
 dd 0x0474022d
 dd 0x85140305
@@ -72774,7 +72774,7 @@ dd 0x75030000
 dd 0xd3257bb8
 dd 0x03000041
 dd 0x2c7be075
-dd ref_00406194
+dd 0x00406194
 dd 0x0000492b
 dd 0x0474022d
 dd 0x85000305
@@ -72797,7 +72797,7 @@ dd 0x75030000
 dd 0xfd257bb8
 dd 0x03000041
 dd 0x2c7be075
-dd ref_004061e4
+dd 0x004061e4
 dd 0x0000492b
 dd 0x0474022d
 dd 0x84e40305
@@ -72820,7 +72820,7 @@ dd 0x75030000
 dd 0x27257bb8
 dd 0x03000042
 dd 0x2c7be075
-dd ref_00406234
+dd 0x00406234
 dd 0x0000492b
 dd 0x0474022d
 dd 0x84c40305
@@ -72843,7 +72843,7 @@ dd 0x75030000
 dd 0x51257bb8
 dd 0x03000042
 dd 0x2c7be075
-dd ref_00406284
+dd 0x00406284
 dd 0x0000492b
 dd 0x0474022d
 dd 0x84a00305
@@ -72866,7 +72866,7 @@ dd 0x75030000
 dd 0x7b257bb8
 dd 0x03000042
 dd 0x2c7be075
-dd ref_004062d4
+dd 0x004062d4
 dd 0x0000492b
 dd 0x0474022d
 dd 0x84700305
@@ -72889,7 +72889,7 @@ dd 0x75030000
 dd 0xa5257bb8
 dd 0x03000042
 dd 0x2c7be075
-dd ref_00406324
+dd 0x00406324
 dd 0x0000492b
 dd 0x0474022d
 dd 0x84580305
@@ -72912,7 +72912,7 @@ dd 0x75030000
 dd 0xcf257bb8
 dd 0x03000042
 dd 0x2c7be075
-dd ref_00406374
+dd 0x00406374
 dd 0x0000492b
 dd 0x0474022d
 dd 0x84400305
@@ -72935,7 +72935,7 @@ dd 0x75030000
 dd 0xf9257bb8
 dd 0x03000042
 dd 0x2c7be075
-dd ref_004063c4
+dd 0x004063c4
 dd 0x0000492b
 dd 0x0474022d
 dd 0x842c0305
@@ -72958,7 +72958,7 @@ dd 0x75030000
 dd 0x23257bb8
 dd 0x03000043
 dd 0x2c7be075
-dd ref_00406414
+dd 0x00406414
 dd 0x0000492b
 dd 0x0474022d
 dd 0x83fc0305
@@ -72981,7 +72981,7 @@ dd 0x75030000
 dd 0x4d257bb8
 dd 0x03000043
 dd 0x2c7be075
-dd ref_00406464
+dd 0x00406464
 dd 0x0000492b
 dd 0x0474022d
 dd 0x83e00305
@@ -73004,7 +73004,7 @@ dd 0x75030000
 dd 0x77257bb8
 dd 0x03000043
 dd 0x2c7be075
-dd ref_004064b4
+dd 0x004064b4
 dd 0x0000492b
 dd 0x0474022d
 dd 0x83c80305
@@ -73027,7 +73027,7 @@ dd 0x75030000
 dd 0x9d257bb8
 dd 0x03000043
 dd 0x2c7be075
-dd ref_00406504
+dd 0x00406504
 dd 0x0000492b
 dd 0x0474022d
 dd 0x83ac0305
@@ -73135,7 +73135,7 @@ dd 0x1074022d
 dd 0x2d007602
 dd 0x02147402
 dd 0x31000073
-dd ref_004066c6
+dd 0x004066c6
 dd 0x00004954
 dd 0x40672231
 dd ref_00459400
@@ -73203,7 +73203,7 @@ dd 0xf800003f
 dd 0xe200002a
 dd 0x2300002a
 dd 0x000047d7
-dd ref_00405c80
+dd 0x00405c80
 dd 0x0fd00001
 dd 0x44010000
 dd 0x20d30a01
@@ -73217,7 +73217,7 @@ dd 0x002bc000
 dd 0x002bba00
 dd 0x23000000
 dd 0x0000479a
-dd ref_00405cab
+dd 0x00405cab
 dd 0x0fe80001
 dd 0x45010000
 dd 0x21120501
@@ -73312,7 +73312,7 @@ dd 0x76090874
 dd 0x082e3000
 dd 0x24331aff
 dd 0x31000000
-dd ref_00405874
+dd 0x00405874
 dd 0x00004a2b
 dd 0x405a9530
 dd 0x004a6000
@@ -73341,14 +73341,14 @@ dd 0x02107402
 dd 0x022d0073
 dd 0x0a031474
 dd 0x30008000
-dd ref_00405b08
+dd 0x00405b08
 dd 0x00004a99
 dd 0x000022e3
 dd 0x0074022d
 dd 0x022d3001
 dd 0x0a030474
 dd 0x30007f00
-dd ref_00405b37
+dd 0x00405b37
 dd 0x00004ab8
 dd 0x000022f8
 dd 0x0074022d
@@ -73391,7 +73391,7 @@ dd 0x012c7402
 dd 0xca310030
 dd 0x5700405d
 dd 0x3000004b
-dd ref_00405de1
+dd 0x00405de1
 dd 0x00004b63
 dd 0x000023a6
 dd 0x0474022d
@@ -73399,12 +73399,12 @@ dd 0x7af87504
 dd 0xf1310006
 dd 0x8000405d
 dd 0x3000004b
-dd ref_00405e09
+dd 0x00405e09
 dd 0x00004ba1
 dd 0x000023c3
 dd 0x0474022d
 dd 0x31003101
-dd ref_00405e12
+dd 0x00405e12
 dd 0x00004bc7
 dd 0x405e1731
 dd 0x0024a500
@@ -73451,7 +73451,7 @@ dd 0x73020074
 dd 0x5e310000
 dd 0xe8004067
 dd 0x2c00004c
-dd ref_0040676b
+dd 0x0040676b
 dd 0x00004cf4
 dd 0x0074022d
 dd 0x00003101
@@ -73549,7 +73549,7 @@ dd 0x00309d00
 dd 0x00309b00
 dd 0x23000000
 dd 0x00004807
-dd ref_00404216
+dd 0x00404216
 dd 0x08900002
 dd 0xb8010000
 dd 0x266f1102
@@ -73600,7 +73600,7 @@ dd 0xd300004d
 dd 0x2d000026
 dd 0x02047402
 dd 0x2c002e08
-dd ref_004042a5
+dd 0x004042a5
 dd 0x00004d50
 dd 0x0074022d
 dd 0x00007602
@@ -73634,7 +73634,7 @@ dd 0x47cb2600
 dd 0x32ef0000
 dd 0x32e90000
 dd 0x2c000000
-dd ref_0040413e
+dd 0x0040413e
 dd 0x00004d5c
 dd 0x0074022d
 dd 0x2d007602
@@ -73643,7 +73643,7 @@ dd 0x40a6ac03
 dd 0x74022d00
 dd 0x040a0308
 dd 0x30000001
-dd ref_00404184
+dd 0x00404184
 dd 0x00004d80
 dd 0x000027bb
 dd 0x0074022d
@@ -73658,7 +73658,7 @@ dd 0x74022d34
 dd 0x80080214
 dd 0x1874022d
 dd 0x31003001
-dd ref_00404195
+dd 0x00404195
 dd 0x00004da0
 dd 0x40419d31
 dd 0x004dbf00
@@ -73699,7 +73699,7 @@ dd 0x03047402
 dd 0x2d77ea91
 dd 0x02087402
 dd 0x30000076
-dd ref_004040d4
+dd 0x004040d4
 dd 0x000049b1
 dd 0x00002884
 dd 0x0474022d
@@ -73722,14 +73722,14 @@ dd 0xbb00004d
 dd 0x2d000028
 dd 0x02007402
 dd 0x30000076
-dd ref_0040401e
+dd 0x0040401e
 dd 0x00004df8
 dd 0x000028d7
 dd 0x0074022d
 dd 0x2d007602
 dd 0x02047402
 dd 0x3000ff09
-dd ref_0040403b
+dd 0x0040403b
 dd 0x00004e04
 dd 0x000028f1
 dd 0x0474022d
@@ -73743,7 +73743,7 @@ dd 0x76020074
 dd 0xb7310000
 dd 0x2a004042
 dd 0x3100004e
-dd ref_004042d5
+dd 0x004042d5
 dd 0x00004e36
 dd 0x1c0b0000
 dd 0x2a000002
@@ -73912,7 +73912,7 @@ dd 0x77020474
 dd 0x74022d00
 dd 0xc4750408
 dd 0x3000067b
-dd ref_004049eb
+dd 0x004049eb
 dd 0x00004e59
 dd 0x00002bd6
 dd 0x0474022d
@@ -73923,7 +73923,7 @@ dd 0xe075030c
 dd 0x1e31007b
 dd 0xee00404a
 dd 0x3000004e
-dd ref_00404a4a
+dd 0x00404a4a
 dd 0x00004f05
 dd 0x00002bfa
 dd 0x0474022d
@@ -73950,7 +73950,7 @@ dd 0x74022d00
 dd 0xc2080204
 dd 0x0874022d
 dd 0x31003101
-dd ref_00404f08
+dd 0x00404f08
 dd 0x00004f1f
 dd 0x4057f02c
 dd 0x004e5900
@@ -73961,7 +73961,7 @@ dd 0x022d3001
 dd 0x30010c74
 dd 0x23000000
 dd 0x00003b00
-dd ref_00404b0a
+dd 0x00404b0a
 dd 0x0ae80001
 dd 0xff010000
 dd 0x2e610d01
@@ -74028,7 +74028,7 @@ dd 0x0000488b
 dd 0x00004194
 dd 0x00004192
 dd 0x31000000
-dd ref_00404b40
+dd 0x00404b40
 dd 0x00004e7b
 dd 0x404b6a30
 dd 0x004eac00
@@ -74113,7 +74113,7 @@ dd 0x02007402
 dd 0x022d0077
 dd 0x75030474
 dd 0x30007be0
-dd ref_00404e32
+dd 0x00404e32
 dd 0x00004b2f
 dd 0x00002f1c
 dd 0x0074022d
@@ -74143,7 +74143,7 @@ dd 0x74022d00
 dd 0x30080204
 dd 0x0c74022d
 dd 0x2c003001
-dd ref_00404e97
+dd 0x00404e97
 dd 0x00004e59
 dd 0x0474022d
 dd 0x2dc50802
@@ -74218,7 +74218,7 @@ dd 0x02007402
 dd 0x022d0076
 dd 0x0a030474
 dd 0x30000110
-dd ref_00404769
+dd 0x00404769
 dd 0x00005027
 dd 0x0000308f
 dd 0x0074022d
@@ -74249,7 +74249,7 @@ dd 0x0874022d
 dd 0x2d007302
 dd 0x020c7402
 dd 0x30000073
-dd ref_004047d4
+dd 0x004047d4
 dd 0x00005001
 dd 0x000030f6
 dd 0x0074022d
@@ -74303,7 +74303,7 @@ dd 0x50700040
 dd 0x55310000
 dd 0x7c004056
 dd 0x31000050
-dd ref_00405661
+dd 0x00405661
 dd 0x00005088
 dd 0x40566d31
 dd 0x00509400
@@ -74312,7 +74312,7 @@ dd 0x50a00040
 dd 0x85310000
 dd 0xac004056
 dd 0x31000050
-dd ref_00405691
+dd 0x00405691
 dd 0x000050b8
 dd 0x40569d31
 dd 0x0050c400
@@ -74321,7 +74321,7 @@ dd 0x50d00040
 dd 0xb5310000
 dd 0xdc004056
 dd 0x31000050
-dd ref_004056c1
+dd 0x004056c1
 dd 0x000050e8
 dd 0x4056cd31
 dd 0x0050f400
@@ -74330,7 +74330,7 @@ dd 0x4b570040
 dd 0xe5310000
 dd 0x00004056
 dd 0x31000051
-dd ref_004056f1
+dd 0x004056f1
 dd 0x0000510c
 dd 0x4056fd31
 dd 0x00511800
@@ -74339,7 +74339,7 @@ dd 0x51240040
 dd 0x15310000
 dd 0x30004057
 dd 0x31000051
-dd ref_00405721
+dd 0x00405721
 dd 0x0000513c
 dd 0x40572d31
 dd 0x00514800
@@ -74720,7 +74720,7 @@ dd 0x00461c00
 dd 0x00461600
 dd 0x27000000
 dd 0x000047d7
-dd ref_00405553
+dd 0x00405553
 dd 0x0f200001
 dd 0xa1010000
 dd 0x00385e17
@@ -74752,7 +74752,7 @@ dd 0x38ab0000
 dd 0x022d0000
 dd 0x75030474
 dd 0x31007be0
-dd ref_0040548f
+dd 0x0040548f
 dd 0x00004594
 dd 0x4054b630
 dd 0x00497200
@@ -74772,7 +74772,7 @@ dd 0x74022d34
 dd 0x00730210
 dd 0x1474022d
 dd 0x30003401
-dd ref_00405550
+dd 0x00405550
 dd 0x00005154
 dd 0x00003929
 dd 0x0474022d
@@ -74795,7 +74795,7 @@ dd 0x31010c74
 dd 0x1074022d
 dd 0xad940305
 dd 0x30000040
-dd ref_00405610
+dd 0x00405610
 dd 0x00005154
 dd 0x00003985
 dd 0x0474022d
@@ -74809,7 +74809,7 @@ dd ref_0040af9c
 dd 0x56213100
 dd 0x49540040
 dd 0x2c000000
-dd ref_00404ce0
+dd 0x00404ce0
 dd 0x000051a6
 dd 0x0074022d
 dd 0x80811106
@@ -74862,7 +74862,7 @@ dd 0x040a0318
 dd 0x5d310002
 dd 0x3c00404d
 dd 0x31000052
-dd ref_00404d75
+dd 0x00404d75
 dd 0x00005255
 dd 0x404d8530
 dd 0x004e3600
@@ -74966,7 +74966,7 @@ dd 0x0b017e01
 dd 0x00000166
 dd 0x235c9102
 dd 0x000047d7
-dd ref_0040441e
+dd 0x0040441e
 dd 0x09180000
 dd 0x7c010000
 dd 0x3c370f01
@@ -74980,7 +74980,7 @@ dd 0x00481000
 dd 0x00480a00
 dd 0x23000000
 dd 0x00004744
-dd ref_0040444d
+dd 0x0040444d
 dd 0x09300001
 dd 0x81010000
 dd 0x3c760f01
@@ -75641,7 +75641,7 @@ dd 0x1074022d
 dd 0x2d6c9102
 dd 0x02147402
 dd 0x31006891
-dd ref_004043ee
+dd 0x004043ee
 dd 0x00004954
 dd 0x43852c00
 dd 0x49d10040
@@ -79632,7 +79632,7 @@ dd 0x19000032
 dd 0x1700004b
 dd 0x2c00004b
 dd 0x000032a1
-dd ref_00406a52
+dd 0x00406a52
 dd 0x406a5203
 dd 0x00000600
 dd 0x31250100
@@ -79640,7 +79640,7 @@ dd 0x0032bc2b
 dd 0x004b2e00
 dd 0x004b2c00
 dd 0x2d000000
-dd ref_00406a38
+dd 0x00406a38
 dd 0x000032ca
 dd 0x0000320d
 dd 0x0074022e
@@ -79654,7 +79654,7 @@ dd 0x32ee0040
 dd 0x502f0000
 dd 0xfa00406a
 dd 0x2f000032
-dd ref_00406a78
+dd 0x00406a78
 dd 0x00003306
 dd 0x406a882d
 dd 0x00331200
@@ -90581,9 +90581,9 @@ db 0x00
 db 0x03
 
 ref_0045724a:
-db 0x52
-db 0x81
-dd 0x9f220040
+dd ref_00408152
+db 0x22
+db 0x9f
 dd 0x00000f37
 dd 0x00000f37
 dd 0x00700009
@@ -93233,8 +93233,8 @@ dd 0x00000000
 dd 0x406b0100
 dd 0x406b0400
 dd 0x50000100
-dd ref_00406b04
-dd ref_00406bbe
+dd 0x00406b04
+dd 0x00406bbe
 dd 0xc5530001
 dd 0xea00406b
 dd 0x0100406b
@@ -93243,10 +93243,10 @@ dd 0x00000000
 dd 0x00010000
 dd 0x00000000
 dd 0x00000000
-dd ref_00406b01
-dd ref_00406b19
+dd 0x00406b01
+dd 0x00406b19
 dd 0x9f300002
-dd ref_00406b19
+dd 0x00406b19
 dd loc_00406b30
 dd 0x94750003
 dd 0x406b377f
