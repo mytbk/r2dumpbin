@@ -19,7 +19,7 @@ class R2PEDumper(R2BinaryDumper):
         self.code_ranges = []
         addr_map = self.r2.cmdj("omj")
         for m in addr_map:
-            r = (m["from"],m["to"])
+            r = (m["from"],m["to"]+1)
             self.addr_ranges.append(r)
             if 'x' in m["perm"]:
                 self.code_ranges.append(r)
