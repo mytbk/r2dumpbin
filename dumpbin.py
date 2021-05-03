@@ -306,18 +306,18 @@ class R2BinaryDumper:
         logging.info("Complete analyzing functions.")
         logging.info("{} locations to be printed.".format(len(self.solved)))
 
-    def analyze_immref(self, addr):
+    def analyze_immref(self, addr, endaddr):
         self.non_function_immref = self.immref.difference(self.solved)
 
         alog.info("Analyze data references @ 0x{:x}.".format(addr))
         cur = addr
         eob = True
-        while self.in_addr_range(cur):
+        while cur < endaddr:
             if cur in self.solved:
                 eob = False
 
             if eob:
-                if cur % 4 == 0 and self.in_addr_range(cur + 3):
+                if cur % 4 == 0 and cur + 3 < endaddr:
                     usedd = True
                     for addr in [cur + 1, cur + 2, cur + 3]:
                         if addr in self.solved or addr in self.non_function_immref \
@@ -379,14 +379,14 @@ class R2BinaryDumper:
         # a quick print pass to find all non function assembly labels,
         # thus avoid printing invalid non_function_immref items
         self.non_function_labels = set()
-        for addr,_ in self.addr_ranges:
-            self.scan_labels_range(addr)
+        for addr,endaddr in self.addr_ranges:
+            self.scan_labels_range(addr,endaddr)
 
-    def scan_labels_range(self,addr):
+    def scan_labels_range(self,addr,endaddr):
         cur = addr
         eob = True
 
-        while self.in_addr_range(cur):
+        while cur < endaddr:
             if cur in self.solved:
                 eob = False
             elif cur in self.non_function_immref:
@@ -411,17 +411,17 @@ class R2BinaryDumper:
     def print_assembly(self):
         print(";; Generated with r2dumpbin (https://github.com/mytbk/r2dumpbin)\n")
         print("bits 32")
-        for addr,_ in self.addr_ranges:
-            self.print_range(addr)
+        for addr,endaddr in self.addr_ranges:
+            self.print_range(addr,endaddr)
 
-    def print_range(self, addr):
+    def print_range(self, addr, endaddr):
         cur = addr
         eob = True
         nsolved = 0
 
         print("org 0x{:08x}".format(addr))
 
-        while self.in_addr_range(cur):
+        while cur < endaddr:
             if cur in self.solved:
                 if cur in self.speculate_set:
                     StrSpec = "  ; not directly referenced"
@@ -454,7 +454,7 @@ class R2BinaryDumper:
                     cur += dist
                     continue
 
-                if self.in_addr_range(cur + 3):
+                if cur + 3 < endaddr:
                     # check if we should interpret a 32-bit word here
                     usedd = True
 
@@ -577,9 +577,8 @@ class R2BinaryDumper:
         self.init_tool()
         self.find_and_mark_functions(analyze)
         self.analyze_functions()
-        for r in self.addr_ranges:
-            start, end = r
-            self.analyze_immref(start)
+        for start,end in self.addr_ranges:
+            self.analyze_immref(start,end)
 
         self.analyze_ascii_strings()
         self.scan_labels()

@@ -39,8 +39,8 @@ class R2PEDumper(R2BinaryDumper):
         print("; link flag and libs: " + '-e fcn_{:08x} '.format(self.entries[0]) +
               ' '.join(['-l' + l for l in self.pe_libs]))
 
-        for addr,_ in self.addr_ranges:
-            self.print_range(addr)
+        for addr,endaddr in self.addr_ranges:
+            self.print_range(addr, endaddr)
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
