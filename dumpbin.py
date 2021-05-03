@@ -411,18 +411,18 @@ class R2BinaryDumper:
                     break
 
 
-    def print_assembly(self):
+    def print_assembly(self, header_fmt):
         print(";; Generated with r2dumpbin (https://github.com/mytbk/r2dumpbin)\n")
         print("bits 32")
         for addr,endaddr in self.addr_ranges:
-            self.print_range(addr,endaddr)
+            self.print_range(addr,endaddr,header_fmt)
 
-    def print_range(self, addr, endaddr):
+    def print_range(self, addr, endaddr, header_fmt):
         cur = addr
         eob = True
         nsolved = 0
 
-        print("org 0x{:08x}".format(addr))
+        print(header_fmt.format(addr))
 
         while cur < endaddr:
             if cur in self.solved:
@@ -576,7 +576,7 @@ class R2BinaryDumper:
             logging.info("solved {} functions, but there are {} functions to be solved!".format(
                 nsolved, len(self.solved)))
 
-    def run_tool(self, analyze = 'aaaa'):
+    def run_tool(self, analyze = 'aaaa', header_fmt='org 0x{:08x}'):
         self.init_tool()
         self.find_and_mark_functions(analyze)
         self.analyze_functions()
@@ -585,7 +585,7 @@ class R2BinaryDumper:
 
         self.analyze_ascii_strings()
         self.scan_labels()
-        self.print_assembly()
+        self.print_assembly(header_fmt)
 
 
 if __name__ == "__main__":

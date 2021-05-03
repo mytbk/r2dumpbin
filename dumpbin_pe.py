@@ -37,7 +37,7 @@ class R2PEDumper(R2BinaryDumper):
 
         self.pe_imports, _, self.pe_libs = r2_pe_import_info(self.r2)
 
-    def print_assembly(self):
+    def print_assembly(self, header_fmt):
         print(";; Generated with r2dumpbin (https://github.com/mytbk/r2dumpbin)\n")
         print("bits 32")
         for sym in self.pe_imports.values():
@@ -47,7 +47,7 @@ class R2PEDumper(R2BinaryDumper):
               ' '.join(['-l' + l for l in self.pe_libs]))
 
         for addr,endaddr in self.addr_ranges:
-            self.print_range(addr, endaddr)
+            self.print_range(addr, endaddr, '')
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
