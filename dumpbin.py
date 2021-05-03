@@ -422,7 +422,8 @@ class R2BinaryDumper:
         eob = True
         nsolved = 0
 
-        print(header_fmt.format(addr))
+        if len(header_fmt) > 0:
+            print(header_fmt.format(addr))
 
         while cur < endaddr:
             if cur in self.solved:

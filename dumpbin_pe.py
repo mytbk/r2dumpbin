@@ -55,7 +55,7 @@ class R2PEDumper(R2BinaryDumper):
         print("global fcn_{:08x}".format(self.entries[0]))
 
         for addr,endaddr in self.addr_ranges:
-            print("section", self.sections[addr])
+            print("\nsection", self.sections[addr])
             self.print_range(addr, endaddr, '')
 
 if __name__ == "__main__":
