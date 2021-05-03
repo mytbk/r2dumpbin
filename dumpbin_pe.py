@@ -21,14 +21,17 @@ class R2PEDumper(R2BinaryDumper):
         self.sections = {}
         addr_map = self.r2.cmdj("omj")
         for m in addr_map:
+            section = m["name"]
+            if section[0:5] in ["fmap.", "mmap."]:
+                section = section[5:]
+
+            if section == ".idata":
+                continue
+
             r = (m["from"],m["to"]+1)
             self.addr_ranges.append(r)
             if 'x' in m["perm"]:
                 self.code_ranges.append(r)
-
-            section = m["name"]
-            if section[0:5] in ["fmap.", "mmap."]:
-                section = section[5:]
 
             self.sections[m["from"]] = section
 
