@@ -209,11 +209,12 @@ class R2BinaryDumper:
                         if insn.get("val") is not None and \
                                 not self.HasReloc and \
                                 self.in_addr_range(insn["val"]):
+                            alog.debug("reference @pc=0x%08x to 0x%08x", insn["offset"], insn["val"])
                             self.immref.add(insn["val"])
 
                         # since now many instructions don't have "ptr" attribute
                         # we need to match the disasm
-                        disasm = insn["disasm"]
+                        disasm = insn["opcode"]
                         # [... + 0x...]
                         m = re.search("\\+ 0x[0-9a-fA-F]+\\]", disasm)
                         if m is not None:
@@ -239,6 +240,7 @@ class R2BinaryDumper:
 
                         if ptr is not None and not self.HasReloc and \
                                 self.in_addr_range(ptr):
+                            alog.debug("reference @pc=0x%08x to 0x%08x", insn["offset"], ptr)
                             self.immref.add(ptr)
 
                     if insn["type"] == "ret":
@@ -256,6 +258,7 @@ class R2BinaryDumper:
                         if ptr is not None and self.in_addr_range(ptr):
                             self.immref.add(ptr)
                             self.jumptab.add(ptr)
+                            alog.debug("jump table reference @pc=0x%08x to 0x%08x", insn["offset"], ptr)
                             cur_ptr = ptr
                             while True:
                                 loc = self.read32(cur_ptr)
