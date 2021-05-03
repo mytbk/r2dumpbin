@@ -9,6 +9,7 @@ from dumpbin import R2BinaryDumper
 from pe_import_resolv import r2_pe_import_info
 import r2pipe
 import sys
+import logging
 
 class R2PEDumper(R2BinaryDumper):
     def __init__(self, r2 = r2pipe.open()):
@@ -23,6 +24,12 @@ class R2PEDumper(R2BinaryDumper):
             self.addr_ranges.append(r)
             if 'x' in m["perm"]:
                 self.code_ranges.append(r)
+
+        for s,e in self.addr_ranges:
+            logging.info("Address range: [0x{:08x},0x{:08x})".format(s,e))
+
+        for s,e in self.code_ranges:
+            logging.info("Code range: [0x{:08x},0x{:08x})".format(s,e))
 
         entries = self.r2.cmdj("iej")
         self.entries = [e["vaddr"] for e in entries]
