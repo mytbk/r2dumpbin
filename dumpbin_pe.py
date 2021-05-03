@@ -18,12 +18,19 @@ class R2PEDumper(R2BinaryDumper):
     def init_tool(self):
         self.addr_ranges = []
         self.code_ranges = []
+        self.sections = {}
         addr_map = self.r2.cmdj("omj")
         for m in addr_map:
             r = (m["from"],m["to"]+1)
             self.addr_ranges.append(r)
             if 'x' in m["perm"]:
                 self.code_ranges.append(r)
+
+            section = m["name"]
+            if section[0:5] in ["fmap.", "mmap."]:
+                section = section[5:]
+
+            self.sections[m["from"]] = section
 
         for s,e in self.addr_ranges:
             logging.info("Address range: [0x{:08x},0x{:08x})".format(s,e))
@@ -45,8 +52,10 @@ class R2PEDumper(R2BinaryDumper):
 
         print("; link flag and libs: " + '-e fcn_{:08x} '.format(self.entries[0]) +
               ' '.join(['-l' + l for l in self.pe_libs]))
+        print("global fcn_{:08x}".format(self.entries[0]))
 
         for addr,endaddr in self.addr_ranges:
+            print("section", self.sections[addr])
             self.print_range(addr, endaddr, '')
 
 if __name__ == "__main__":
