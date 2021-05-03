@@ -47,7 +47,7 @@ def toString(s):
         c = s[i]
         if started:
             result += ","
-        if c >= 0x20 and c < 0x7f and chr(c) not in ['\'', '%']:
+        if c >= 0x20 and c < 0x7f and chr(c) not in ['\'', '%', ',']:
             result += "'" + chr(c) + "'"
         elif chr(c) == '%':
             # FIXME: does nasm accept "%1", "%2",...?
