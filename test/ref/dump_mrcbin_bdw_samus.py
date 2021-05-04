@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # script used to dump samus mrc.bin
+# SHA256: 96b15aae46f4ba8b59685b5b937350b31850ca400806ea4252ee5d749e780631
 
 import sys
 import r2pipe
