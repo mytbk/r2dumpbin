@@ -121,6 +121,8 @@ class R2BinaryDumper:
 
         self.unsolved.append(self.BaseAddr)
 
+        # FIXME: when HasReloc, we can only support the case when
+        # BaseAddr=0, otherwise the analysis can fail
         if self.HasReloc:
             for addr in self.RelocAddr:
                 ref_addr = self.read32(addr) + self.BaseAddr
@@ -254,8 +256,17 @@ class R2BinaryDumper:
                         break
 
                     # find jump/call table
-                    if insn["type"] in ["ujmp", "ucall"]:
-                        if ptr is not None and self.in_addr_range(ptr):
+                    if insn["type"] in ["ujmp", "ucall"] and ptr is not None:
+                        if not self.HasReloc and self.in_addr_range(ptr):
+                            search_jumptab = True
+                        elif self.HasReloc and ptr in self.immref:
+                            # when there is relocation, the jump table address should be calculated
+                            # and added to immref
+                            search_jumptab = True
+                        else:
+                            search_jumptab = False
+
+                        if search_jumptab:
                             self.immref.add(ptr)
                             self.jumptab.add(ptr)
                             alog.debug("jump table reference @pc=0x%08x to 0x%08x", insn["offset"], ptr)
@@ -266,6 +277,8 @@ class R2BinaryDumper:
                                     self.unsolved.append(loc)
                                 elif self.HasReloc and cur_ptr in self.RelocAddr \
                                      and self.in_code_range(loc + self.BaseAddr):
+                                    # the jump target in a relocatable file should also be stored at the
+                                    # reloacted address
                                     loc += self.BaseAddr
                                     self.unsolved.append(loc)
                                 else:
