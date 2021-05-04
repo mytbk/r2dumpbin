@@ -495,6 +495,11 @@ class R2BinaryDumper:
                                 print("dd 0x{:08x}".format(val))
                             else:
                                 usedd = False
+                        elif self.HasReloc:
+                            if cur % 4 == 0:
+                                print("dd 0x{:08x}".format(val))
+                            else:
+                                usedd = False
 
                         if usedd:
                             cur = cur + 4
