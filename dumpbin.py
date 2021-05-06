@@ -45,6 +45,13 @@ class R2BinaryDumper:
         self.functions = set()
         self.str_dict = dict()
         self.non_function_labels = set()
+        # mark pointers in data blocks: First we find all the possible
+        # pointers. After the immrefs are all found, we use
+        # min_block_pointer_portion to check if there're enough
+        # pointers in a data block.
+        self.pointer_map = dict()
+        self.pointers = set()
+        self.min_block_pointer_portion = 1.0/3
         self.SpecMode = False
         self.HasReloc = False
         self.code_ranges = []
@@ -341,7 +348,8 @@ class R2BinaryDumper:
                       and end_of_bytes not in self.endaddrs:
                     end_of_bytes = end_of_bytes + 1
 
-                bytes_to_analyze = self.readBytes(cur, end_of_bytes - cur)
+                num_bytes = end_of_bytes - cur
+                bytes_to_analyze = self.readBytes(cur, num_bytes)
                 cur_ptr = cur
                 while cur_ptr + 3 < end_of_bytes:
                     offset = cur_ptr - cur
@@ -352,6 +360,7 @@ class R2BinaryDumper:
                             self.non_function_immref.add(val32)
 
                         alog.debug("Find immref to 0x{:08x}@0x{:08x}".format(val32,cur_ptr))
+                        self.pointer_map[cur_ptr] = val32
                         cur_ptr = cur_ptr + 4
                     else:
                         cur_ptr = cur_ptr + 1
@@ -407,10 +416,13 @@ class R2BinaryDumper:
         cur = addr
         eob = True
 
+        labels = []
         while cur < endaddr:
             if cur in self.solved:
+                labels.append(cur)
                 eob = False
             elif cur in self.non_function_immref:
+                labels.append(cur)
                 self.non_function_labels.add(cur)
 
             if eob:
@@ -427,6 +439,25 @@ class R2BinaryDumper:
                 if cur in self.solved or cur in self.endaddrs:
                     eob = True
                     break
+
+        # We collect the possible pointers after finding all the labels
+        labels.append(endaddr)
+        blocks = []
+        for i in range(len(labels) - 1):
+            if labels[i] in self.non_function_labels:
+                blocks.append((labels[i], labels[i+1]))
+
+        for b_start, b_end in blocks:
+            bsize = b_end - b_start
+            ptrs = set()
+            for addr in range(b_start, b_end):
+                if addr in self.pointer_map:
+                    ptrs.add(addr)
+
+            if len(ptrs) * 4 >= bsize * self.min_block_pointer_portion:
+                alog.debug("{} pointers in block @0x{:08x}, add to the pointer set."
+                           .format(len(ptrs), b_start))
+                self.pointers.update(ptrs)
 
 
     def print_assembly(self, header_fmt):
@@ -483,7 +514,7 @@ class R2BinaryDumper:
                     # there's some known label in the 4 bytes, not a word
                     for addr in [cur + 1, cur + 2, cur + 3]:
                         if addr in self.solved or addr in self.non_function_labels \
-                                or addr in self.endaddrs:
+                                or addr in self.endaddrs or addr in self.pointers:
                             usedd = False
                             break
 
