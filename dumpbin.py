@@ -73,6 +73,9 @@ class R2BinaryDumper:
         val = (Bytes[3] << 24) | (Bytes[2] << 16) | (Bytes[1] << 8) | Bytes[0]
         return val
 
+    def readBytes(self, addr, l):
+        return self.r2.cmdj("xj {} @ {}".format(l, addr))
+
     def setReloc(self, relocAddrs):
         self.HasReloc = True
         self.RelocAddr = relocAddrs
@@ -333,25 +336,27 @@ class R2BinaryDumper:
                 eob = False
 
             if eob:
-                if cur % 4 == 0 and cur + 3 < endaddr:
-                    usedd = True
-                    for addr in [cur + 1, cur + 2, cur + 3]:
-                        if addr in self.solved or addr in self.non_function_immref \
-                                or addr in self.endaddrs:
-                            usedd = False
-                            break
-                    if usedd:
-                        val = self.read32(cur)
-                        if not self.HasReloc and \
-                                self.in_addr_range(val) and \
-                                not val in self.solved:
-                            self.non_function_immref.add(val)
+                end_of_bytes = cur + 1
+                while end_of_bytes < endaddr and end_of_bytes not in self.solved \
+                      and end_of_bytes not in self.endaddrs:
+                    end_of_bytes = end_of_bytes + 1
 
-                        cur = cur + 4
-                        continue
+                bytes_to_analyze = self.readBytes(cur, end_of_bytes - cur)
+                cur_ptr = cur
+                while cur_ptr + 3 < end_of_bytes:
+                    offset = cur_ptr - cur
+                    val32b = bytes_to_analyze[offset:offset+4]
+                    val32 = (val32b[3] << 24) | (val32b[2] << 16) | (val32b[1] << 8) | val32b[0]
+                    if not self.HasReloc and self.in_addr_range(val32):
+                        if not val32 in self.solved:
+                            self.non_function_immref.add(val32)
 
-                # cur is not 4B aligned or not usedd
-                cur = cur + 1
+                        alog.debug("Find immref to 0x{:08x}@0x{:08x}".format(val32,cur_ptr))
+                        cur_ptr = cur_ptr + 4
+                    else:
+                        cur_ptr = cur_ptr + 1
+
+                cur = end_of_bytes
                 continue
 
             else:  # not eob
