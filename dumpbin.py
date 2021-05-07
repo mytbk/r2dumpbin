@@ -329,12 +329,12 @@ class R2BinaryDumper:
             self.solved.add(self.unsolved[0])
             del(self.unsolved[0])
 
+        self.non_function_immref = self.immref.difference(self.solved)
+
         logging.info("Complete analyzing functions.")
         logging.info("{} locations to be printed.".format(len(self.solved)))
 
     def analyze_immref(self, addr, endaddr):
-        self.non_function_immref = self.immref.difference(self.solved)
-
         alog.info("Analyze data references @ 0x{:x}.".format(addr))
         cur = addr
         eob = True
@@ -424,6 +424,7 @@ class R2BinaryDumper:
             elif cur in self.non_function_immref:
                 labels.append(cur)
                 self.non_function_labels.add(cur)
+                alog.debug("Add non-function label @0x{:08x}.".format(cur))
 
             if eob:
                 cur = cur + 1
