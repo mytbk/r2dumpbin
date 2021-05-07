@@ -28,6 +28,9 @@ class R2PEDumper(R2BinaryDumper):
             if section == ".idata":
                 continue
 
+            if section == ".reloc":
+                continue
+
             r = (m["from"],m["to"]+1)
             self.addr_ranges.append(r)
             if 'x' in m["perm"]:
