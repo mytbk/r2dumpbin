@@ -73,3 +73,6 @@ def ptrSub(insn, sym):
     final_insn = re.sub("\\+ 0x[0-9a-fA-F]*\\]", "+ {}]".format(sym), final_insn)
     final_insn = re.sub("0x[0-9a-fA-F]*\\]", "{}]".format(sym), final_insn)
     return final_insn
+
+def bytes_to_i32(bs):
+    return (bs[3] << 24) | (bs[2] << 16) | (bs[1] << 8) | bs[0]

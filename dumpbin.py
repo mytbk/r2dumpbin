@@ -77,7 +77,7 @@ class R2BinaryDumper:
 
     def read32(self, addr):
         Bytes = self.r2.cmdj("xj 4 @ {}".format(addr))
-        val = (Bytes[3] << 24) | (Bytes[2] << 16) | (Bytes[1] << 8) | Bytes[0]
+        val = bytes_to_i32(Bytes)
         return val
 
     def readBytes(self, addr, l):
@@ -353,8 +353,7 @@ class R2BinaryDumper:
                 cur_ptr = cur
                 while cur_ptr + 3 < end_of_bytes:
                     offset = cur_ptr - cur
-                    val32b = bytes_to_analyze[offset:offset+4]
-                    val32 = (val32b[3] << 24) | (val32b[2] << 16) | (val32b[1] << 8) | val32b[0]
+                    val32 = bytes_to_i32(bytes_to_analyze[offset:offset+4])
                     if not self.HasReloc and self.in_addr_range(val32):
                         if not val32 in self.solved:
                             self.non_function_immref.add(val32)
