@@ -39,25 +39,23 @@ def goodString(s):
 
     return isAsciiSeq(s[0:end])
 
-
 def toString(s):
-    result = ""
-    started = False
-    for i in range(len(s)):
-        c = s[i]
-        if started:
-            result += ","
-        if c >= 0x20 and c < 0x7f and chr(c) not in ['\'', '%', ',']:
-            result += "'" + chr(c) + "'"
-        elif chr(c) == '%':
-            # FIXME: does nasm accept "%1", "%2",...?
-            #        Leave the handling code here...
-            result += "'" + chr(c) + "'"
+    string_segs = []
+    seg = ""
+    for c in s:
+        if c >= 0x20 and c < 0x7f and chr(c) not in ['\'']:
+            seg += chr(c)
         else:
-            result += "0x{:02x}".format(c)
-        started = True
-    return result.replace("','", "")
+            if len(seg) > 0:
+                string_segs.append("'" + seg + "'")
+                seg = ""
 
+            string_segs.append("0x{:02x}".format(c))
+
+    if len(seg) > 0:
+        string_segs.append("'" + seg + "'")
+
+    return ",".join(string_segs)
 
 # get the reloc addresses with:
 # readelf -r refcode.elf | cut -d' ' -f1 | grep '^[0-9]' | sed -e 's/^/0x/g' -e 's/$/,/g'
