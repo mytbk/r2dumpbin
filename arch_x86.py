@@ -1,3 +1,6 @@
+# Copyright (C)  2021 Iru Cai <mytbk920423@gmail.com>
+# SPDX-License-Identifier: MIT
+
 import re
 
 segmem_expr = re.compile('(cs|ds|es|ss|fs|gs):\[(.*)\]')

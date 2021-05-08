@@ -1,3 +1,6 @@
+# Copyright (C)  2021 Iru Cai <mytbk920423@gmail.com>
+# SPDX-License-Identifier: MIT
+
 import sys
 
 from pe_import_resolv import r2_pe_import_info
