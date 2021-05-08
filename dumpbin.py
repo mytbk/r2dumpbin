@@ -635,8 +635,10 @@ class R2BinaryDumper:
         self.init_tool()
         self.find_and_mark_functions(analyze)
         self.analyze_functions()
-        for start,end in self.addr_ranges:
-            self.analyze_immref(start,end)
+
+        if not self.HasReloc:
+            for start,end in self.addr_ranges:
+                self.analyze_immref(start,end)
 
         self.analyze_ascii_strings()
         self.scan_labels()
