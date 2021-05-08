@@ -70,7 +70,10 @@ class R2PEDumper(R2BinaryDumper):
 
         for addr,endaddr in self.addr_ranges:
             print("\nsection", self.sections[addr])
-            self.print_range(addr, endaddr, '')
+            if self.sections[addr] == ".bss":
+                self.print_bss(addr, endaddr)
+            else:
+                self.print_range(addr, endaddr, '')
 
     def process_pe_reloc(self,reloc_data):
         idx = 0

@@ -643,6 +643,19 @@ class R2BinaryDumper:
             logging.info("solved {} functions, but there are {} functions to be solved!".format(
                 nsolved, len(self.solved)))
 
+    def print_bss(self, addr, endaddr):
+        labels = [addr]
+        for i in range(addr + 1, endaddr):
+            if i in self.non_function_labels:
+                labels.append(i)
+
+        labels.append(endaddr)
+
+        for i in range(len(labels) - 1):
+            l = labels[i+1] - labels[i]
+            print("\nref_{:08x}:".format(labels[i]))
+            print("resb", l)
+
     def run_tool(self, analyze = 'aaaa', header_fmt='org 0x{:08x}'):
         self.init_tool()
         self.find_and_mark_functions(analyze)
