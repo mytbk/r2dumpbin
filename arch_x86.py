@@ -58,14 +58,14 @@ def asmfixup(dumper, insn):
         final_insn = re.sub(
             "0x.*", prefix + "{:08x}".format(tgt), orig_insn)
         comment = orig_insn
-    elif orig_insn[0:5] in ["fcom ", "fsub ", "fxch ", "fstp "] or \
-         orig_insn[0:6] in ["fmulp ", "fdivp ", "faddp ", "fsubp "] or \
+    elif orig_insn[0:5] in ["fcom ", "fsub ", "fxch ", "fstp ", "fdiv "] or \
+         orig_insn[0:6] in ["fmulp ", "fdivp ", "faddp ", "fsubp ", "fdivr "] or \
          orig_insn[0:4] in ["fld "] or \
          orig_insn[0:7] in ["fdivrp "]:
         final_insn = orig_insn.replace("xword", "tword") # 80-bit "ten word"
         final_insn = re.sub("st\(([0-9])\)", "st\\1", final_insn)
         comment = orig_insn
-    elif orig_insn[0:7] in ["fnstsw "]:
+    elif orig_insn[0:7] in ["fnstsw ", "fnsave ", "frstor "]:
         final_insn = orig_insn.replace(" dword", "")
 
     # fix addressing expressions with a segment selector
