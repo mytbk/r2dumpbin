@@ -33,7 +33,13 @@ Aggresive = 2
 class R2BinaryDumper:
     def __init__(self, r2=r2pipe.open(), scripts=["f va @ 0xfffa0000"]):
         self.r2 = r2
-        self.RelocAddr = []
+        # RelocAddr: image offset that have data to be relocated
+        # ptr[i] = BaseAddr+RelocAddr[i], *(ptr[i]) += BaseAddr
+        # To avoid modifying the relocated addresses *(ptr[i]), we leave the
+        # binaries at its original base address, i.e.:
+        # - For refcode.elf, BaseAddr = 0
+        # - For relocatable PE, BaseAddr = image base
+        self.RelocAddr = set()
         self.unsolved = []
         self.speculate = set()
         self.speculate_set = set()
@@ -85,8 +91,18 @@ class R2BinaryDumper:
 
     def setReloc(self, relocAddrs):
         self.HasReloc = True
-        self.RelocAddr = relocAddrs
+        self.RelocAddr.update(relocAddrs)
         logging.info("Found {} relocation addresses.".format(len(self.RelocAddr)))
+
+    def add_relocation_immref(self):
+        for addr in self.RelocAddr:
+            # the data stored at ref_addr is the original data when
+            # the binary is loaded at the default base
+            rptr = self.BaseAddr + addr
+            ref_addr = self.read32(rptr)
+            self.immref.add(ref_addr)
+            logging.debug("Add immref 0x{:08x} due to relocation from 0x{:08x}."
+                          .format(ref_addr,rptr))
 
     def in_addr_range(self, addr):
         for r in self.addr_ranges:
@@ -131,14 +147,8 @@ class R2BinaryDumper:
 
         self.unsolved.append(self.BaseAddr)
 
-        # FIXME: when HasReloc, we can only support the case when
-        # BaseAddr=0, otherwise the analysis can fail
         if self.HasReloc:
-            for addr in self.RelocAddr:
-                ref_addr = self.read32(addr) + self.BaseAddr
-                self.immref.add(ref_addr)
-                logging.debug(
-                    "Add immref 0x{:08x} due to relocation.".format(ref_addr))
+            self.add_relocation_immref()
 
     def isRelocInsn(self, offset, size):
         for i in range(0, size):
@@ -285,11 +295,10 @@ class R2BinaryDumper:
                                 loc = self.read32(cur_ptr)
                                 if not self.HasReloc and self.in_code_range(loc):
                                     self.unsolved.append(loc)
-                                elif self.HasReloc and cur_ptr in self.RelocAddr \
-                                     and self.in_code_range(loc + self.BaseAddr):
+                                elif self.HasReloc and cur_ptr-self.BaseAddr in self.RelocAddr \
+                                     and self.in_code_range(loc):
                                     # the jump target in a relocatable file should also be stored at the
                                     # reloacted address
-                                    loc += self.BaseAddr
                                     self.unsolved.append(loc)
                                 else:
                                     break
@@ -517,10 +526,13 @@ class R2BinaryDumper:
                                 or addr in self.endaddrs or addr in self.pointers:
                             usedd = False
                             break
+                        if self.HasReloc and addr-self.BaseAddr in self.RelocAddr:
+                            usedd = False
+                            break
 
                     if usedd:
                         val = self.read32(cur)
-                        if not self.HasReloc or cur in self.RelocAddr:
+                        if not self.HasReloc or cur-self.BaseAddr in self.RelocAddr:
                             if val in self.functions:
                                 print("dd fcn_{:08x}".format(val))
                             elif val in self.solved:
