@@ -67,6 +67,20 @@ def asmfixup(dumper, insn):
         comment = orig_insn
     elif orig_insn[0:7] in ["fnstsw ", "fnsave ", "frstor "]:
         final_insn = orig_insn.replace(" dword", "")
+    elif insn["type"] in ["cmp", "add", "sub"] and insn["size"] >= 5 and \
+         '[' not in orig_insn:
+        val = insn.get("val", 0xffffffff)
+        ibytes = dumper.readBytes(insn["offset"], insn["size"])
+        if val < 0x80 and ibytes[0] != 0x66:
+            # nasm emits short instructions when immediate can fit in one byte
+            fixup = True
+            if val in dumper.solved or val in dumper.non_function_labels or val in dumper.label_adjust:
+                if not dumper.HasReloc or dumper.isRelocInsn(insn["offset"], insn["size"]):
+                    fixup = False
+
+            if fixup:
+                final_insn = "db " + ", ".join(["0x{:02x}".format(i) for i in ibytes])
+                comment = orig_insn
 
     # fix addressing expressions with a segment selector
     final_insn = segmem_expr.sub('[\\1:\\2]', final_insn)
