@@ -14,6 +14,16 @@ def asmfixup(dumper, insn):
     if insn["type"] == "lea":
         # nasm doesn't like "lea r32, dword ..."
         final_insn = orig_insn.replace("dword ", "")
+    elif insn["bytes"] == "f2a5":
+        # capstone 4.0.2 gets wrong here
+        final_insn = "repne movsd"
+    elif ("movsb" in orig_insn or "movsw" in orig_insn or "movsd" in orig_insn \
+          or "lods" in orig_insn or "stos" in orig_insn) \
+         and "66" in [insn["bytes"][0:2], insn["bytes"][2:4]]:
+        # capstone also seems to be wrong here
+        comment = orig_insn
+        ibytes = dumper.readBytes(insn["offset"], insn["size"])
+        final_insn = "db " + ", ".join(["0x{:02x}".format(i) for i in ibytes])
     elif orig_insn[0:4] == "rep ":
         # rep XXXsX
         comment = orig_insn
