@@ -51,6 +51,11 @@ class R2BinaryDumper:
         self.functions = set()
         self.str_dict = dict()
         self.non_function_labels = set()
+        # labels that needs to be adjusted because they split a pointer
+        # we move the label to a higher address, and store this label in
+        # label_adjust map, where label_adjuct[lab] = adjusted_lab and
+        # the added offset is (adjusted_lab - lab)
+        self.label_adjust = dict()
         # mark pointers in data blocks: First we find all the possible
         # pointers. After the immrefs are all found, we use
         # min_block_pointer_portion to check if there're enough
@@ -420,8 +425,8 @@ class R2BinaryDumper:
         for addr,endaddr in self.addr_ranges:
             self.scan_labels_range(addr,endaddr)
 
-    def scan_labels_range(self,addr,endaddr):
-        cur = addr
+    def scan_labels_range(self,startaddr,endaddr):
+        cur = startaddr
         eob = True
 
         labels = []
@@ -467,6 +472,24 @@ class R2BinaryDumper:
                 alog.debug("{} pointers in block @0x{:08x}, add to the pointer set."
                            .format(len(ptrs), b_start))
                 self.pointers.update(ptrs)
+
+        # adjust labels to avoid pointer split
+        for addr in range(startaddr, endaddr):
+            hasPtr = False
+            if self.HasReloc and addr-self.BaseAddr in self.RelocAddr:
+                hasPtr = True
+            elif not self.HasReloc and addr in self.pointers:
+                hasPtr = True
+
+            if hasPtr:
+                for i in range(addr + 1, addr + 4):
+                    if i in self.non_function_labels:
+                        self.label_adjust[i] = addr + 4
+                        self.non_function_labels.remove(i)
+                        self.non_function_labels.add(addr + 4)
+                        if i in self.jumptab:
+                            self.jumptab.remove(i)
+                            self.jumptab.add(addr + 4)
 
 
     def print_assembly(self, header_fmt):
@@ -539,6 +562,9 @@ class R2BinaryDumper:
                                 print("dd loc_{:08x}".format(val))
                             elif val in self.non_function_labels:
                                 print("dd ref_{:08x}".format(val))
+                            elif val in self.label_adjust:
+                                newlab = self.label_adjust[val]
+                                print("dd (ref_{:08x} - {})".format(newlab, newlab - val))
                             elif cur % 4 == 0:
                                 print("dd 0x{:08x}".format(val))
                             else:
@@ -573,21 +599,25 @@ class R2BinaryDumper:
                     # process val and ptr
                     val = insn.get("val")
                     if val is not None:
+                        sym_resolv = True
                         if val in self.functions:
-                            prefix = "fcn_"
+                            sym = "fcn_{:08x}".format(val)
                         elif val in self.solved:
-                            prefix = "loc_"
+                            sym = "loc_{:08x}".format(val)
                         elif val in self.non_function_labels:
-                            prefix = "ref_"
+                            sym = "ref_{:08x}".format(val)
+                        elif val in self.label_adjust:
+                            newlab = self.label_adjust[val]
+                            sym = "(ref_{:08x} - {})".format(newlab, newlab - val)
                         else:
-                            prefix = ""
+                            sym_resolv = False
 
-                        if len(prefix) > 0:
+                        if sym_resolv:
                             # we also need to check relocation
                             if not self.HasReloc or self.isRelocInsn(insn["offset"], insn["size"]):
                                 comment = orig_insn
                                 final_insn = re.sub(
-                                    "0x[0-9a-fA-F]*$", prefix + "{:08x}".format(val), final_insn)
+                                    "0x[0-9a-fA-F]*$", sym, final_insn)
 
                     # since now many instructions don't have "ptr" attribute
                     # we need to match the disasm
@@ -615,9 +645,18 @@ class R2BinaryDumper:
                         if ptr in self.pe_imports:
                             final_insn = ptrSub(final_insn, self.pe_imports[ptr])
                             comment = orig_insn
-                        elif ptr in self.non_function_labels:
-                            if not self.HasReloc or self.isRelocInsn(insn["offset"], insn["size"]):
-                                final_insn = ptrSub(final_insn, "ref_{:08x}".format(ptr))
+                        elif not self.HasReloc or self.isRelocInsn(insn["offset"], insn["size"]):
+                            sym_resolv = True
+                            if ptr in self.non_function_labels:
+                                sym = "ref_{:08x}".format(ptr)
+                            elif ptr in self.label_adjust:
+                                newlab = self.label_adjust[ptr]
+                                sym = "(ref_{:08x} - {})".format(newlab, newlab - ptr)
+                            else:
+                                sym_resolv = False
+
+                            if sym_resolv:
+                                final_insn = ptrSub(final_insn, sym)
                                 comment = orig_insn
 
                 if insn["type"] in ["ujmp", "ucall"]:
