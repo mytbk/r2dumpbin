@@ -46,7 +46,7 @@ def asmfixup(dumper, insn):
         elif insn["type"] != "call":
             if insn["size"] == 2:
                 prefix = "short "
-            elif insn["size"] == 5:
+            elif insn["size"] >= 5:
                 prefix = "near "
 
         tgt = insn["jump"]
