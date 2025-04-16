@@ -13,7 +13,19 @@
 # Then you can run `nasm mrc.asm` to generate a binary
 # called mrc which is identical to mrc.bin
 
-import r2pipe
+try:
+    raise RuntimeError("TODO: rizin and rzpipe is not supported yet")
+    import rzpipe as r2pipe
+    Reloc_Cmd = "omb."
+    Flag_List_Cmd = "flj"
+except:
+    import r2pipe
+    # r2 relocate command changes between versions, so find the command first
+    r2test = r2pipe.open("malloc://512")
+    Reloc_Cmd = r2test.cmd("om?~relocate current map").split(' ')[1]
+    r2test.quit()
+    Flag_List_Cmd = "fj"
+
 import re
 import logging
 from dumpbin_util import *
@@ -125,17 +137,17 @@ class R2BinaryDumper:
         return False
 
     def init_tool(self):
-        self.r2.cmd("e asm.bits = 32")
+        self.r2.cmd("e asm.bits=32")
 
         self.BaseAddr = 0
         self.FileSize = self.r2.cmdj("ij")["core"]["size"]
         EndAddr = self.FileSize
 
-        Flags = self.r2.cmdj("fj")
+        Flags = self.r2.cmdj(Flag_List_Cmd)
         for f in Flags:
             if f["name"] == "va":
                 self.BaseAddr = f["offset"]
-                self.r2.cmd("omb. {}".format(self.BaseAddr))
+                self.r2.cmd("{} {}".format(Reloc_Cmd, self.BaseAddr))
                 self.r2.cmd("s {}".format(self.BaseAddr))
                 EndAddr = self.BaseAddr + self.FileSize
             elif "reloc:" in f["name"]:
