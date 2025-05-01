@@ -13,7 +13,7 @@ import sys
 import logging
 
 class R2PEDumper(R2BinaryDumper):
-    def __init__(self, r2 = r2pipe.open()):
+    def __init__(self, r2):
         super(R2PEDumper, self).__init__(r2, scripts = [])
 
     def init_tool(self):
@@ -107,6 +107,6 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         r2dumpbin = R2PEDumper(r2pipe.open(sys.argv[1]))
     else:
-        r2dumpbin = R2PEDumper()
+        r2dumpbin = R2PEDumper(r2pipe.open())
 
     r2dumpbin.run_tool()

@@ -43,8 +43,12 @@ Aggresive = 2
 
 
 class R2BinaryDumper:
-    def __init__(self, r2=r2pipe.open(), scripts=["f va @ 0xfffa0000"]):
-        self.r2 = r2
+    def __init__(self, r2=None, scripts=["f va @ 0xfffa0000"]):
+        if r2 is None:
+            self.r2 = r2pipe.open()
+        else:
+            self.r2 = r2
+
         # RelocAddr: image offset that have data to be relocated
         # ptr[i] = BaseAddr+RelocAddr[i], *(ptr[i]) += BaseAddr
         # To avoid modifying the relocated addresses *(ptr[i]), we leave the
