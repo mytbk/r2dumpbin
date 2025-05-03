@@ -7,8 +7,9 @@ I wrote this script for working with the `coreboot <https://www.coreboot.org>`__
 
 While recovering the assembly to readable C code is hard work even with `Ghidra <https://ghidra-sre.org/>`__ decompiler released in 2019, I found it easy to do some binary modding or instrumentation after getting an assembly dump. Now I try to use this tool to recover more kinds of binaries besides mrc.bin.
 
-The script is tested in radare2 5.2.1 and python-r2pipe 5.1.0 from Arch Linux.
+The script is tested in radare2 5.2.1, python-r2pipe 5.1.0 and 5.9.0 from Arch Linux.
 
+**Note: Newer radare2 (latest version is 5.9.8 for now) may change the behavior of some commands, and the disassembled code may change. To reproduce the disassembly result of my tests, you can checkout radare2 5.2.1 and build it yourself.**
 
 What does this script do?
 ---------------------------
