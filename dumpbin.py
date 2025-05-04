@@ -549,11 +549,7 @@ class R2BinaryDumper:
                 print("endloc_{:08x}:".format(cur))
 
             if eob:
-                if self.str_dict.get(cur) is not None:
-                    dbs, dist = self.str_dict[cur]
-                    print("db {}".format(dbs))
-                    cur += dist
-                    continue
+                has_ascii_string = self.str_dict.get(cur) is not None
 
                 if cur + 3 < endaddr:
                     # check if we should interpret a 32-bit word here
@@ -581,12 +577,16 @@ class R2BinaryDumper:
                             elif val in self.label_adjust:
                                 newlab = self.label_adjust[val]
                                 print("dd (ref_{:08x} - {})".format(newlab, newlab - val))
+                            elif has_ascii_string:
+                                usedd = False
                             elif cur % 4 == 0:
                                 print("dd 0x{:08x}".format(val))
                             else:
                                 usedd = False
                         elif self.HasReloc:
-                            if cur % 4 == 0:
+                            if has_ascii_string:
+                                usedd = False
+                            elif cur % 4 == 0:
                                 print("dd 0x{:08x}".format(val))
                             else:
                                 usedd = False
@@ -594,6 +594,13 @@ class R2BinaryDumper:
                         if usedd:
                             cur = cur + 4
                             continue
+
+                # print ASCII string if possible
+                if has_ascii_string:
+                    dbs, dist = self.str_dict[cur]
+                    print("db {}".format(dbs))
+                    cur += dist
+                    continue
 
                 # we don't write 32-bit word, use db
                 Byte = self.r2.cmdj("xj 1 @ {}".format(cur))[0]
