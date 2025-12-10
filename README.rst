@@ -92,3 +92,8 @@ It is very hard to disassemble an object to correct code. There may be bugs incl
 
 - pointers wrongly recognized or ignored when analyzing non-relocatable objects
 - assembly doesn't built to identical code, which needs fix up
+
+Related work
+-------------------------------
+
+It looks like this kind of work is a part of so-called ``reassembly``, ``binary rewriting``. There is some SOTA work on this such as `SURI <https://github.com/SoftSec-KAIST/SURI>`__.
